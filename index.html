@@ -765,26 +765,193 @@ function renderEstoque(){
 }
 
 // ════════════════════════════════════
+// SUPABASE CONFIG
+// ════════════════════════════════════
+// ── CREDENCIAIS SUPABASE ──────────────────────────────────
+// Cole aqui sua URL e anon key para conectar automaticamente
+// Use APENAS a anon key (nunca a service_role key neste arquivo)
+const SB_URL_DEFAULT = 'https://SEU_PROJETO.supabase.co'; // ← substitua
+const SB_KEY_DEFAULT = 'SUA_ANON_KEY_AQUI';               // ← substitua
+
+let SB_URL = localStorage.getItem('ct_sb_url') || SB_URL_DEFAULT;
+let SB_KEY  = localStorage.getItem('ct_sb_key') || SB_KEY_DEFAULT;
+let sbConfigured = !!(SB_URL && SB_KEY && !SB_URL.includes('SEU_PROJETO'));
+
+// Injetar banner de configuração no topo
+(function injectConfigBanner(){
+  const banner = document.createElement('div');
+  banner.id='sb-banner';
+  banner.style.cssText=`background:#fff8e1;border-bottom:1px solid #f59e0b55;padding:9px 28px;display:flex;align-items:center;gap:10px;font-size:12px;color:#92400e;${sbConfigured?'display:none!important':''}`;
+  banner.innerHTML=`
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Exibindo dados de demonstração. Configure o Supabase para dados reais.
+    <button onclick="toggleSbForm()" style="background:none;border:none;color:#1A56DB;font-size:12px;cursor:pointer;text-decoration:underline;padding:0">Configurar agora</button>
+    <button onclick="document.getElementById('sb-banner').style.display='none'" style="margin-left:auto;background:none;border:none;color:#92400e;cursor:pointer;font-size:16px;line-height:1">×</button>`;
+
+  const form = document.createElement('div');
+  form.id='sb-form';
+  form.style.cssText='display:none;background:#fff;border-bottom:1px solid #e5e7eb;padding:14px 28px;gap:12px;align-items:flex-end;flex-wrap:wrap';
+  form.innerHTML=`
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:#6b7280">
+      URL do Supabase
+      <input id="sb-url-in" type="text" placeholder="https://xxxx.supabase.co" value="${SB_URL}"
+        style="width:300px;border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:#111827">
+    </label>
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:#6b7280">
+      Anon Key (chave pública)
+      <input id="sb-key-in" type="password" placeholder="eyJhbGciOiJIUzI1NiIs..." value="${SB_KEY}"
+        style="width:340px;border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:#111827">
+    </label>
+    <button onclick="saveSbConfig()" style="background:#1A56DB;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Salvar e conectar</button>
+    <button onclick="clearSbConfig()" style="background:none;border:1px solid #d1d5db;color:#6b7280;border-radius:7px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit">Limpar</button>
+    <span id="sb-status" style="font-size:12px;color:#6b7280"></span>`;
+
+  document.body.insertBefore(form, document.body.firstChild);
+  document.body.insertBefore(banner, document.body.firstChild);
+  if(sbConfigured) banner.style.display='none';
+})();
+
+function toggleSbForm(){
+  const f=document.getElementById('sb-form');
+  f.style.display=f.style.display==='none'?'flex':'none';
+}
+function saveSbConfig(){
+  SB_URL=document.getElementById('sb-url-in').value.trim().replace(/\/$/,'');
+  SB_KEY=document.getElementById('sb-key-in').value.trim();
+  if(!SB_URL||!SB_KEY){document.getElementById('sb-status').textContent='⚠ Preencha os dois campos.';return;}
+  localStorage.setItem('ct_sb_url',SB_URL);
+  localStorage.setItem('ct_sb_key',SB_KEY);
+  sbConfigured=true;
+  document.getElementById('sb-form').style.display='none';
+  document.getElementById('sb-banner').style.display='none';
+  document.getElementById('sb-status').textContent='';
+  refreshAll();
+}
+function clearSbConfig(){
+  localStorage.removeItem('ct_sb_url');localStorage.removeItem('ct_sb_key');
+  SB_URL='';SB_KEY='';sbConfigured=false;
+  document.getElementById('sb-url-in').value='';
+  document.getElementById('sb-key-in').value='';
+  document.getElementById('sb-status').textContent='Configuração removida. Usando dados demo.';
+}
+
+// ════════════════════════════════════
+// SUPABASE FETCH
+// ════════════════════════════════════
+async function sbFetch(path){
+  const res=await fetch(`${SB_URL}/rest/v1/${path}`,{
+    headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Accept':'application/json'}
+  });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// Mapeia linha da vw_dashboard para o formato UN usado pelo painel
+function mapDashboardRow(row, transp, canais, hh, int12){
+  return {
+    nome: row.nome,
+    cidade: row.cidade,
+    kpis:{
+      int_total: row.recebidos   || 0,
+      backlog:   row.total_backlog || 0,
+      int_00h:   row.recebidos   || 0,
+      exp_00h:   row.expedidos   || 0,
+    },
+    transp: transp.length ? transp.map(t=>({
+      n:t.transportadora, c:t.corte||'—',
+      total:t.total||0, exp:t.expedido||0, pend:t.pendente||0,
+      pct:t.pct_finalizado||0
+    })) : UN[row.codigo]?.transp || [],
+    canais: canais.length ? canais.map(c=>({
+      c:c.canal, total:c.total||0, fin:c.finalizado||0,
+      pend:c.pendente||0, pct:c.pct_finalizado||0, sub:[]
+    })) : UN[row.codigo]?.canais || [],
+    hh: hh.length ? hh.map(h=>({
+      h:`${String(h.hora).padStart(2,'0')}:00`,
+      b2b:h.b2b||0, b2c:h.b2c||0, tot:h.total||0
+    })) : UN[row.codigo]?.hh || [],
+    int12: int12.length ? int12.map(t=>({
+      n:t.transportadora, c:t.corte||'—',
+      total:t.total||0, exp:t.expedido||0, pend:t.pendente||0,
+      pct:t.pct_finalizado||0
+    })) : UN[row.codigo]?.int12 || [],
+  };
+}
+
+async function carregarDoSupabase(){
+  try {
+    setStatus('Buscando dados...');
+
+    // Buscar view principal + hora_hora em paralelo
+    const [dashboard, hhData] = await Promise.all([
+      sbFetch('vw_dashboard?select=*'),
+      sbFetch('hora_hora?select=*&data_ref=eq.'+today()+'&order=hora.asc').catch(()=>[]),
+    ]);
+
+    if(dashboard && dashboard.length){
+      const codigoMap = {'CD_SP':'SP','CD_RJ':'RJ','CD_PE':'PE','DS_BSB':'DARK','DS_POA':'DARK'};
+
+      dashboard.forEach(row=>{
+        const key = codigoMap[row.codigo];
+        if(!key || !UN[key]) return;
+
+        UN[key].nome   = row.nome   || UN[key].nome;
+        UN[key].cidade = row.cidade || UN[key].cidade;
+        if(row.recebidos   != null) UN[key].kpis.int_total = row.recebidos;
+        if(row.expedidos   != null) UN[key].kpis.exp_00h   = row.expedidos;
+        if(row.recebidos   != null) UN[key].kpis.int_00h   = row.recebidos;
+        if(row.total_backlog!= null) UN[key].kpis.backlog  = row.total_backlog;
+        if(row.sla_percentual    != null) UN[key].kpis.sla     = row.sla_percentual;
+        if(row.estoque_nivel     != null) UN[key].kpis.estoque = row.estoque_nivel;
+        if(row.ruptura_percentual!= null) UN[key].kpis.ruptura = row.ruptura_percentual;
+      });
+
+      if(hhData && hhData.length){
+        const codigoMapHH = {'CD_SP':'SP','CD_RJ':'RJ','CD_PE':'PE','DS_BSB':'DARK','DS_POA':'DARK'};
+        hhData.forEach(h=>{
+          const key=codigoMapHH[h.unidade_codigo];
+          if(!key||!UN[key]) return;
+          if(!UN[key]._hhLoaded){ UN[key].hh=[]; UN[key]._hhLoaded=true; }
+          UN[key].hh.push({
+            h:String(h.hora).padStart(2,'0')+':00',
+            b2b:h.b2b||0, b2c:h.b2c||0, tot:h.total||0
+          });
+        });
+      }
+
+      setStatus('');
+    } else {
+      setStatus('Sem dados na view. Usando demo.');
+    }
+  } catch(e){
+    setStatus('Erro: '+e.message);
+    console.warn('Supabase error:',e);
+  }
+}
+
+function today(){ return new Date().toISOString().split('T')[0]; }
+function setStatus(msg){
+  const el=document.getElementById('sb-status');
+  if(el) el.textContent=msg;
+  if(msg) document.getElementById('live-lbl').textContent=msg.startsWith('⚠')?'Erro':'Buscando…';
+}
+
+// ════════════════════════════════════
 // REFRESH
 // ════════════════════════════════════
-function refreshAll(){
+async function refreshAll(manual=false){
   const ic=document.getElementById('ref-icon');
   ic.classList.add('spinning');
-  setTimeout(()=>{
-    renderCarteira();renderBacklog();renderOtif();renderComplaints();renderEstoque();
-    ic.classList.remove('spinning');
-    document.getElementById('live-lbl').textContent='Atualizado';
-    setTimeout(()=>document.getElementById('live-lbl').textContent='Ao vivo',2000);
-  },700);
+  if(sbConfigured) await carregarDoSupabase();
+  renderCarteira();renderBacklog();renderOtif();renderComplaints();renderEstoque();
+  ic.classList.remove('spinning');
+  const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('live-lbl').textContent=`${sbConfigured?'Supabase':'Demo'} · ${now}`;
 }
 
 // INIT
-renderCarteira();
-renderBacklog();
-renderOtif();
-renderComplaints();
-renderEstoque();
-setInterval(refreshAll,30000);
+refreshAll();
+setInterval(()=>refreshAll(),30000);
 
 // ════════════════════════════════════
 // SLIDESHOW
