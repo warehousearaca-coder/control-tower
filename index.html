@@ -65,11 +65,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .spinning{animation:spin .7s linear infinite}
 
 /* ══ ALERT BANNER ══ */
-#alert-banner{display:none;background:#7f1d1d;color:#fff;padding:8px 24px;font-size:12px;font-weight:600;align-items:center;gap:10px;animation:alertPulse 2s infinite}
+#alert-banner{display:none;background:#fff;border-bottom:2px solid #dc2626;padding:7px 24px;font-size:12px;font-weight:600;align-items:center;gap:12px;flex-wrap:wrap}
 #alert-banner.show{display:flex}
-@keyframes alertPulse{0%,100%{background:#7f1d1d}50%{background:#dc2626}}
-.alert-item{display:flex;align-items:center;gap:5px}
-.alert-item svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
+.alert-tag{display:flex;align-items:center;gap:5px;background:#fee2e2;color:#7f1d1d;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;animation:tagPulse 2s infinite}
+.alert-tag svg{width:11px;height:11px;stroke:#dc2626;fill:none;stroke-width:2.5;stroke-linecap:round;flex-shrink:0}
+@keyframes tagPulse{0%,100%{background:#fee2e2}50%{background:#fca5a5}}
+.alert-label{font-size:10px;font-weight:800;color:#dc2626;text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.alert-label svg{width:14px;height:14px;stroke:#dc2626;fill:none;stroke-width:2;stroke-linecap:round}
+.alert-tags-wrap{display:flex;gap:6px;flex-wrap:wrap;flex:1}
 
 /* ══ PAGES ══ */
 .page{display:none;max-width:1500px;margin:0 auto;padding:20px 24px 48px;animation:fadeUp .25s ease}
@@ -240,10 +243,12 @@ tr.sub td:first-child{padding-left:28px}
 
 <!-- ══ ALERT BANNER ══ -->
 <div id="alert-banner">
-  <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-  <span>⚠ ALERTAS ATIVOS:</span>
-  <span id="alert-text"></span>
-  <button onclick="document.getElementById('alert-banner').classList.remove('show')" style="margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:18px;line-height:1">×</button>
+  <div class="alert-label">
+    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Alertas
+  </div>
+  <div class="alert-tags-wrap" id="alert-text"></div>
+  <button onclick="document.getElementById('alert-banner').classList.remove('show')" style="margin-left:auto;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;line-height:1;flex-shrink:0">×</button>
 </div>
 
 <!-- ══ TOPBAR ══ -->
@@ -563,7 +568,7 @@ function checkAlerts(){
   if(+COMP.SP.y26[2]>0.14) alerts.push(`Complaints SP: ${fp(COMP.SP.y26[2],3)}`);
   const banner=document.getElementById('alert-banner');
   if(alerts.length){
-    document.getElementById('alert-text').textContent=alerts.join(' · ');
+    document.getElementById('alert-text').innerHTML=alerts.map(a=>`<div class="alert-tag"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>${a}</div>`).join('');
     banner.classList.add('show');
   } else {banner.classList.remove('show');}
 }
