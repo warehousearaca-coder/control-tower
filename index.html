@@ -3,1272 +3,562 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Tower — Luft · Nespresso</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Carteira de Pedidos — Control Tower</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --blue:#1A56DB;--blue-lt:#EFF6FF;--blue-dk:#1240a8;
-  --green:#16a34a;--green-lt:#dcfce7;--green-dk:#14532d;
+  --blue:#2563eb;--blue-lt:#dbeafe;--blue-glow:rgba(37,99,235,.15);
+  --green:#059669;--green-lt:#d1fae5;
   --amber:#d97706;--amber-lt:#fef3c7;
   --red:#dc2626;--red-lt:#fee2e2;
-  --bg:#f0f4f8;--surface:#fff;
-  --border:rgba(0,0,0,.07);--border-md:rgba(0,0,0,.12);
-  --text:#111827;--muted:#6b7280;--subtle:#9ca3af;
-  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --purple:#7c3aed;--purple-lt:#ede9fe;
+  --bg:#f8fafc;--surface:#fff;
+  --border:#e2e8f0;--border-hover:#cbd5e1;
+  --text:#0f172a;--muted:#64748b;--subtle:#94a3b8;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.1);
+  --r:14px;--r-sm:9px;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
 
 /* ── TOPBAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;position:sticky;top:0;z-index:200;box-shadow:var(--shadow)}
-.brand{display:flex;align-items:center;gap:10px;padding:13px 20px 13px 0;border-right:1px solid var(--border);margin-right:20px;flex-shrink:0}
-.brand-icon{width:34px;height:34px;background:var(--blue);border-radius:9px;display:grid;place-items:center}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:200;box-shadow:var(--shadow-sm)}
+.brand{display:flex;align-items:center;gap:10px;padding:12px 20px 12px 0;border-right:1px solid var(--border);margin-right:20px;flex-shrink:0}
+.brand-icon{width:34px;height:34px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:10px;display:grid;place-items:center;box-shadow:0 2px 8px rgba(37,99,235,.3)}
 .brand-icon svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.brand-name{font-size:14px;font-weight:700;letter-spacing:-.2px}
-.brand-sub{font-size:10px;color:var(--muted);margin-top:1px}
-.nav-pills{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
+.brand-name{font-size:14px;font-weight:800;letter-spacing:-.3px}
+.brand-sub{font-size:10px;color:var(--muted);margin-top:1px;font-weight:500}
+.nav-pills{display:flex;gap:1px;flex:1;overflow-x:auto;scrollbar-width:none}
 .nav-pills::-webkit-scrollbar{display:none}
-.np{padding:15px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;font-family:var(--font);white-space:nowrap;border-bottom:2.5px solid transparent;transition:all .15s}
+.np{padding:14px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;font-family:var(--font);white-space:nowrap;border-bottom:2.5px solid transparent;transition:all .15s}
 .np:hover{color:var(--text)}
-.np.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
-.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto;padding-left:16px;border-left:1px solid var(--border);flex-shrink:0}
-.live-pill{display:flex;align-items:center;gap:5px;background:var(--green-lt);color:var(--green-dk);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.np.active{color:var(--blue);border-bottom-color:var(--blue)}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;padding-left:16px;border-left:1px solid var(--border);flex-shrink:0}
+.live-pill{display:flex;align-items:center;gap:5px;background:var(--green-lt);color:#065f46;font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;letter-spacing:.01em}
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.btn-sm{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:7px;border:1px solid var(--border-md);background:var(--surface);font-family:var(--font);font-size:12px;font-weight:500;color:var(--text);cursor:pointer;transition:background .12s}
-.btn-sm:hover{background:#f3f4f6}
-.btn-sm svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.btn-icon{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:12px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s}
+.btn-icon:hover{background:#f1f5f9;border-color:var(--border-hover)}
+.btn-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinning{animation:spin .7s linear infinite}
 
-/* ── PAGES ── */
-.page{display:none;max-width:1400px;margin:0 auto;padding:22px 28px 48px;animation:fadeIn .2s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* ── WRAP ── */
+.wrap{max-width:1500px;margin:0 auto;padding:20px 24px 48px}
 
 /* ── PAGE HEADER ── */
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.ph h1{font-size:20px;font-weight:700;letter-spacing:-.4px}
-.ph p{font-size:12px;color:var(--muted);margin-top:2px}
+.ph-left h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.ph-left p{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
 .ph-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ph-right label{font-size:11px;font-weight:600;color:var(--muted)}
-.ph-right select{border:1px solid var(--border-md);border-radius:7px;padding:6px 10px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--surface);cursor:pointer}
-.target-wrap{display:flex;align-items:center;gap:8px}
-.tgt{font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px}
-.tgt-gray{background:#f1f5f9;color:var(--muted)}
-.tgt-ok{background:var(--green-lt);color:var(--green-dk)}
-.tgt-warn{background:var(--amber-lt);color:#92400e}
-.tgt-bad{background:var(--red-lt);color:#7f1d1d}
+.ph-right label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ph-right select{border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;font-size:12px;font-family:var(--font);font-weight:600;color:var(--text);background:var(--surface);cursor:pointer;box-shadow:var(--shadow-sm)}
 
-/* ── KPI ROW ── */
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+/* ── KPI CARDS ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 @media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
-.kpi-blue::before{background:var(--blue)}.kpi-green::before{background:var(--green)}
-.kpi-amber::before{background:var(--amber)}.kpi-red::before{background:var(--red)}
-.kpi-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
-.kpi-val{font-size:30px;font-weight:700;letter-spacing:-.8px;line-height:1;font-variant-numeric:tabular-nums}
-.kpi-blue .kpi-val{color:var(--blue)}.kpi-green .kpi-val{color:var(--green)}
-.kpi-amber .kpi-val{color:var(--amber)}.kpi-red .kpi-val{color:var(--red)}
-.kpi-sub{font-size:11px;color:var(--muted);margin-top:5px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:default}
+.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.kpi-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0}
+.kpi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.kpi-icon svg{width:17px;height:17px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kpi-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.kpi-val{font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
+.kpi-delta{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600}
+.kpi-delta svg{width:12px;height:12px;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.delta-up{color:var(--green)}.delta-dn{color:var(--red)}.delta-neu{color:var(--muted)}
+/* Blue */
+.kpi-blue .kpi-accent{background:linear-gradient(90deg,#2563eb,#60a5fa)}
+.kpi-blue .kpi-icon{background:var(--blue-lt)}
+.kpi-blue .kpi-icon svg{stroke:var(--blue)}
+.kpi-blue .kpi-val{color:var(--blue)}
+/* Green */
+.kpi-green .kpi-accent{background:linear-gradient(90deg,#059669,#34d399)}
+.kpi-green .kpi-icon{background:var(--green-lt)}
+.kpi-green .kpi-icon svg{stroke:var(--green)}
+.kpi-green .kpi-val{color:var(--green)}
+/* Amber */
+.kpi-amber .kpi-accent{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.kpi-amber .kpi-icon{background:var(--amber-lt)}
+.kpi-amber .kpi-icon svg{stroke:var(--amber)}
+.kpi-amber .kpi-val{color:var(--amber)}
+/* Red */
+.kpi-red .kpi-accent{background:linear-gradient(90deg,#dc2626,#f87171)}
+.kpi-red .kpi-icon{background:var(--red-lt)}
+.kpi-red .kpi-icon svg{stroke:var(--red)}
+.kpi-red .kpi-val{color:var(--red)}
 
 /* ── GRID ── */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-@media(max-width:960px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.g13{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-bottom:14px}
+.g31{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:1100px){.g2,.g3,.g13,.g31{grid-template-columns:1fr}}
 
 /* ── CARD ── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px}
-.card:last-child{margin-bottom:0}
-.card-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafbfc}
-.card-title{font-size:13px;font-weight:600}
-.card-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.no-mb{margin-bottom:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.card-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700;letter-spacing:-.1px}
+.card-sub{font-size:11px;color:var(--muted);margin-top:1px;font-weight:500}
+.card-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.03em}
+.cb-blue{background:var(--blue-lt);color:var(--blue)}
+.cb-green{background:var(--green-lt);color:var(--green)}
+.cb-amber{background:var(--amber-lt);color:var(--amber)}
+.cb-red{background:var(--red-lt);color:var(--red)}
 
-/* ── TABLES ── */
+/* ── GAUGE ── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 16px 12px;gap:8px}
+.gauge-svg{width:180px;height:100px;overflow:visible}
+.gauge-val{font-size:28px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums;text-anchor:middle;dominant-baseline:middle}
+.gauge-lbl{font-size:10px;font-weight:600;fill:var(--muted);text-anchor:middle;text-transform:uppercase;letter-spacing:.06em}
+.gauge-meta{display:flex;gap:16px;margin-top:4px}
+.gauge-item{text-align:center}
+.gauge-item-val{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.gauge-item-lbl{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+
+/* ── HEATMAP ── */
+.heatmap{padding:14px 18px}
+.hm-grid{display:grid;grid-template-columns:80px repeat(5,1fr);gap:4px;align-items:center}
+.hm-header{font-size:10px;font-weight:700;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.05em}
+.hm-label{font-size:11px;font-weight:600;color:var(--text)}
+.hm-cell{height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);cursor:default;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.05);z-index:1;position:relative}
+
+/* ── TABLE ── */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#f8f9fb;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#f8fafc;border-bottom:1px solid var(--border);white-space:nowrap}
 th.r,td.r{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:11px}
-tbody td{padding:8px 14px;border-bottom:1px solid rgba(0,0,0,.04);white-space:nowrap;vertical-align:middle}
+tbody td{padding:9px 14px;border-bottom:1px solid rgba(0,0,0,.04);white-space:nowrap;vertical-align:middle}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:#f8fafc}
-tr.total td{background:#f4f6f9;font-weight:700;border-top:1px solid var(--border-md)}
-tr.sub td{color:var(--muted);background:#fafbfc;font-size:11px}
+tr.total td{background:#f1f5f9;font-weight:700;border-top:1px solid var(--border)}
+tr.sub td{color:var(--muted);font-size:11px}
 tr.sub td:first-child{padding-left:28px}
 .bold{font-weight:700}
-.pct{display:inline-flex;align-items:center;justify-content:center;min-width:64px;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;font-family:var(--mono)}
-.pg{background:var(--green-lt);color:var(--green-dk)}
+.pct{display:inline-flex;align-items:center;justify-content:center;min-width:66px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;font-family:var(--mono)}
+.pg{background:var(--green-lt);color:#065f46}
 .pa{background:var(--amber-lt);color:#92400e}
 .pr{background:var(--red-lt);color:#7f1d1d}
 .p0{background:#f1f5f9;color:var(--muted)}
-.neg{color:var(--red);font-family:var(--mono)}
-.pos{color:var(--green);font-family:var(--mono)}
-.bl{color:var(--red);font-weight:700;font-family:var(--mono)}
 
-/* ── CHART ── */
-.chart-box{padding:16px 18px 12px;position:relative}
+/* ── CHART BOX ── */
+.chart-box{padding:14px 18px 10px}
+.chart-legend{display:flex;gap:12px;padding:0 18px 12px;flex-wrap:wrap}
+.cl-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted)}
+.cl-dot{width:10px;height:10px;border-radius:3px}
 
-/* ── ESTOQUE CARDS ── */
-.est-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px;background:var(--border)}
-.est-card{background:var(--surface);padding:14px 16px}
-.est-card-name{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.est-dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
-.est-val{font-size:17px;font-weight:700;letter-spacing:-.3px}
-.est-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
-.est-itens{font-size:11px;color:var(--muted)}
-.est-share{font-size:11px;color:var(--muted)}
-.est-delta{font-size:10px;padding:2px 6px;border-radius:4px}
-.delta-up{background:var(--green-lt);color:var(--green-dk)}
-.delta-flat{background:#f1f5f9;color:var(--muted)}
-.est-bar-wrap{height:3px;background:#f1f5f9;border-radius:99px;margin-top:8px;overflow:hidden}
-.est-bar{height:100%;background:var(--blue);border-radius:99px}
+/* ── PROGRESS BAR ── */
+.prog-wrap{padding:14px 18px}
+.prog-item{margin-bottom:12px}
+.prog-item:last-child{margin-bottom:0}
+.prog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.prog-name{font-size:12px;font-weight:600}
+.prog-val{font-size:11px;font-weight:700;font-family:var(--mono)}
+.prog-track{height:8px;background:#f1f5f9;border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
 
-/* ── CHART HIST BARS (CSS) ── */
-.hist-chart{padding:14px 18px 10px}
-.hist-bars{display:flex;align-items:flex-end;gap:3px;height:110px;border-bottom:1px solid var(--border);margin-bottom:6px;padding:0 2px 4px;position:relative}
-.hist-group{display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;gap:1px}
-.hbar{width:100%;border-radius:2px 2px 0 0;min-height:1px}
-.b24{background:#c4a882}.b25{background:#6b3f1e}.b26{background:var(--blue)}
-.hlbl{font-size:9px;color:var(--muted);text-align:center;margin-top:4px}
-.hval{font-size:9px;color:var(--text);font-weight:600;font-family:var(--mono);text-align:center}
-.target-line{position:absolute;left:0;right:0;border-top:1.5px dashed var(--red);pointer-events:none}
-.target-lbl{position:absolute;right:4px;font-size:8px;color:var(--red);font-weight:700;top:-11px}
-.hist-legend{display:flex;gap:10px;flex-wrap:wrap}
-.hl-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
-.hl-dot{width:8px;height:8px;border-radius:2px}
-/* ── SLIDESHOW ── */
-.btn-slide{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important}
-.btn-slide:hover{background:var(--blue-dk)!important}
-#slide-overlay{display:none}
-#slide-overlay.active{display:flex!important}
-/* slide content dark theme overrides */
-#slide-content .kpi{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
-#slide-content .kpi-lbl{color:rgba(255,255,255,.5)}
-#slide-content .kpi-sub{color:rgba(255,255,255,.4)}
-#slide-content .kpi-blue .kpi-val{color:#60a5fa}
-#slide-content .kpi-green .kpi-val{color:#4ade80}
-#slide-content .kpi-amber .kpi-val{color:#fbbf24}
-#slide-content .kpi-red .kpi-val{color:#f87171}
-#slide-content .card{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
-#slide-content .card-head{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
-#slide-content .card-title{color:#fff}
-#slide-content .card-sub{color:rgba(255,255,255,.45)}
-#slide-content table thead th{background:rgba(255,255,255,.05);color:rgba(255,255,255,.45);border-color:rgba(255,255,255,.08)}
-#slide-content table tbody td{border-color:rgba(255,255,255,.05);color:rgba(255,255,255,.85)}
-#slide-content table tbody tr:hover td{background:rgba(255,255,255,.05)}
-#slide-content table tbody tr.total td{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
-#slide-content table tbody tr.sub td{color:rgba(255,255,255,.4);background:rgba(255,255,255,.02)}
-#slide-content .target-wrap .tgt-gray{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6)}
-#slide-content .est-card{background:rgba(255,255,255,.05)}
-#slide-content .est-card-name{color:rgba(255,255,255,.5)}
-#slide-content .est-val{color:#fff}
-#slide-content .est-itens,#slide-content .est-share{color:rgba(255,255,255,.45)}
-#slide-content .est-bar-wrap{background:rgba(255,255,255,.1)}
-#slide-content .hist-chart .hlbl{color:rgba(255,255,255,.4)}
-#slide-content .hist-chart .hval{color:rgba(255,255,255,.8)}
-#slide-content .hl-item{color:rgba(255,255,255,.45)}
-#slide-content .hist-bars{border-color:rgba(255,255,255,.1)}
-.slide-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .2s;border:none}
-.slide-dot.active{background:#fff;width:20px;border-radius:4px}
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .4s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
+.d5{animation-delay:.25s}.d6{animation-delay:.3s}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <nav class="topbar">
   <div class="brand">
     <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
     <div><div class="brand-name">Control Tower</div><div class="brand-sub">Luft · Nespresso</div></div>
   </div>
   <div class="nav-pills">
-    <button class="np active" onclick="goPage('carteira',this)">Carteira de Pedidos</button>
-    <button class="np" onclick="goPage('backlog',this)">Backlog</button>
-    <button class="np" onclick="goPage('otif',this)">BTQ OTIF</button>
-    <button class="np" onclick="goPage('complaints',this)">Complaints</button>
-    <button class="np" onclick="goPage('estoque',this)">Estoque</button>
+    <button class="np active">Carteira de Pedidos</button>
+    <button class="np">Backlog</button>
+    <button class="np">BTQ OTIF</button>
+    <button class="np">Complaints</button>
+    <button class="np">Estoque</button>
   </div>
   <div class="topbar-right">
     <div class="live-pill"><div class="live-dot"></div><span id="live-lbl">Ao vivo</span></div>
-    <button class="btn-sm" onclick="refreshAll()"><svg id="ref-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Atualizar</button>
-    <button class="btn-sm btn-slide" onclick="startSlideshow()" id="btn-slide" title="Apresentação automática">
-      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Apresentação
-    </button>
+    <button class="btn-icon" onclick="refresh()"><svg id="ref-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Atualizar</button>
+    <button class="btn-icon btn-primary"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Apresentação</button>
   </div>
 </nav>
 
-<!-- ═══════ SLIDESHOW OVERLAY ═══════ -->
-<div id="slide-overlay" style="display:none;position:fixed;inset:0;background:#0f172a;z-index:1000;flex-direction:column">
-  <!-- Slide Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:30px;height:30px;background:var(--blue);border-radius:8px;display:grid;place-items:center">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-.2px">Control Tower</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.5)">Luft · Nespresso</div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <!-- Dots -->
-      <div id="slide-dots" style="display:flex;gap:6px"></div>
-      <!-- Timer ring -->
-      <div style="position:relative;width:32px;height:32px;margin:0 4px">
-        <svg width="32" height="32" style="transform:rotate(-90deg)">
-          <circle cx="16" cy="16" r="13" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="2.5"/>
-          <circle id="slide-timer-ring" cx="16" cy="16" r="13" fill="none" stroke="#1A56DB" stroke-width="2.5"
-            stroke-dasharray="81.7" stroke-dashoffset="0" style="transition:stroke-dashoffset .1s linear"/>
-        </svg>
-        <span id="slide-timer-num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(255,255,255,.7)">8</span>
-      </div>
-      <!-- Controls -->
-      <button onclick="slidePrev()" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;display:grid;place-items:center" title="Anterior">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button onclick="slidePause()" id="btn-pause" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;display:grid;place-items:center" title="Pausar">
-        <svg id="pause-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      </button>
-      <button onclick="slideNext()" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;display:grid;place-items:center" title="Próximo">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-      <button onclick="stopSlideshow()" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;display:grid;place-items:center" title="Sair (Esc)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-  </div>
-  <!-- Slide Title Bar -->
-  <div style="padding:12px 28px 0;flex-shrink:0">
-    <div id="slide-title" style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-.4px"></div>
-    <div id="slide-subtitle" style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px"></div>
-  </div>
-  <!-- Slide Content -->
-  <div id="slide-content" style="flex:1;overflow-y:auto;padding:16px 28px 24px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent"></div>
-</div>
-
-<!-- ═══════════ PAGE: CARTEIRA ═══════════ -->
-<div id="page-carteira" class="page active">
+<div class="wrap">
   <div class="ph">
-    <div><h1>Carteira de Pedidos</h1><p id="cart-sub">CD SP · São Paulo</p></div>
+    <div class="ph-left"><h1>Carteira de Pedidos</h1><p id="ph-sub">CD SP · São Paulo · atualizado agora</p></div>
     <div class="ph-right">
       <label>Unidade</label>
-      <select id="sel-un" onchange="renderCarteira()">
-        <option value="SP">CD SP</option><option value="RJ">CD RJ</option>
-        <option value="PE">CD PE</option><option value="DARK">Dark Store</option>
+      <select id="sel-un" onchange="render()">
+        <option value="SP">CD SP</option>
+        <option value="RJ">CD RJ</option>
+        <option value="PE">CD PE</option>
+        <option value="DARK">Dark Store</option>
       </select>
     </div>
   </div>
-  <div class="kpi-row" id="kpis-cart"></div>
-  <div class="g2" id="g-transp-canal"></div>
-  <div class="g2" id="g-hh-int"></div>
-  <div class="card no-mb">
-    <div class="card-head"><div><div class="card-title">% Finalizado por Transportadora</div><div class="card-sub">Verde ≥80% · Amarelo ≥50% · Vermelho &lt;50%</div></div></div>
-    <div class="chart-box" style="height:220px"><canvas id="ch-transp" role="img" aria-label="% finalizado por transportadora"></canvas></div>
-  </div>
-</div>
 
-<!-- ═══════════ PAGE: BACKLOG ═══════════ -->
-<div id="page-backlog" class="page">
-  <div class="ph">
-    <div><h1>Backlog</h1><p>Não cumprimento do prazo desde o batch (integração) até a expedição.</p></div>
-    <div class="target-wrap">
-      <span class="tgt tgt-gray">TARGET: 0,80%</span>
-      <span class="tgt tgt-ok" id="bl-real">REALIZADO: 0,10%</span>
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- ROW 1: Gauges + Barras B2B/B2C -->
+  <div class="g13" id="row1">
+    <div class="card anim d1" id="gauges-card">
+      <div class="card-head"><div><div class="card-title">SLA & Finalização</div><div class="card-sub">Performance do dia</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)">
+        <div style="border-right:1px solid var(--border)" id="gauge-sla"></div>
+        <div id="gauge-fin"></div>
+      </div>
+    </div>
+    <div class="card anim d2">
+      <div class="card-head"><div><div class="card-title">Expedição B2B vs B2C</div><div class="card-sub">Barras empilhadas por corte de transportadora</div></div></div>
+      <div class="chart-box" style="height:200px"><canvas id="ch-b2b-b2c" role="img" aria-label="expedição B2B vs B2C por transportadora"></canvas></div>
+      <div class="chart-legend" id="leg-b2b-b2c"></div>
     </div>
   </div>
-  <div class="g2">
-    <div class="card no-mb">
-      <div class="card-head"><div class="card-title">Backlog B2B — CD SP</div></div>
-      <div class="tbl-wrap"><table id="tbl-b2b">
-        <thead><tr><th>Data</th><th class="r">Planejado</th><th class="r">Integ. Corte</th><th class="r">% Variação</th><th class="r">Backlog</th><th class="r">% Backlog</th><th class="r">Integ. 00h</th><th class="r">Exped. 00h</th></tr></thead>
+
+  <!-- ROW 2: Linha hora a hora + Mapa de calor -->
+  <div class="g2" id="row2">
+    <div class="card anim d3">
+      <div class="card-head"><div><div class="card-title">Tendência Hora × Hora</div><div class="card-sub">Expedição acumulada no dia</div></div></div>
+      <div class="chart-box" style="height:200px"><canvas id="ch-hh" role="img" aria-label="tendência hora a hora"></canvas></div>
+    </div>
+    <div class="card anim d4">
+      <div class="card-head"><div><div class="card-title">Mapa de Calor — % Finalizado</div><div class="card-sub">Por transportadora e canal</div></div></div>
+      <div class="heatmap" id="heatmap"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Progress bars + Tabela -->
+  <div class="g31" id="row3">
+    <div class="card anim d5">
+      <div class="card-head"><div><div class="card-title">Por Transportadora</div><div class="card-sub">Total · Expedido · % Finalizado</div></div></div>
+      <div class="prog-wrap" id="prog-transp"></div>
+    </div>
+    <div class="card anim d6">
+      <div class="card-head"><div><div class="card-title">Por Canal</div></div></div>
+      <div class="tbl-wrap"><table id="tbl-canal">
+        <thead><tr><th>Canal</th><th class="r">Total</th><th class="r">Finaliz.</th><th class="r">% Fin.</th></tr></thead>
         <tbody></tbody>
       </table></div>
     </div>
-    <div class="card no-mb">
-      <div class="card-head"><div class="card-title">Backlog B2C — CD SP</div></div>
-      <div class="tbl-wrap"><table id="tbl-b2c">
-        <thead><tr><th>Data</th><th class="r">Planejado</th><th class="r">Integ. Corte</th><th class="r">% Variação</th><th class="r">Backlog</th><th class="r">% Backlog</th><th class="r">Integ. 00h</th><th class="r">Exped. 00h</th></tr></thead>
-        <tbody></tbody>
-      </table></div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="card no-mb" id="ch-bl-sp"></div>
-    <div class="card no-mb" id="ch-bl-rj"></div>
-  </div>
-  <div class="g2" style="margin-top:14px">
-    <div class="card no-mb" id="ch-bl-pe"></div>
-    <div class="card no-mb" id="ch-bl-dark"></div>
-  </div>
-</div>
-
-<!-- ═══════════ PAGE: OTIF ═══════════ -->
-<div id="page-otif" class="page">
-  <div class="ph">
-    <div><h1>BTQ OTIF</h1><p>On Time, In Full — pedidos sem divergência e no prazo correto.</p></div>
-    <div class="target-wrap">
-      <span class="tgt tgt-gray">TARGET: 97%</span>
-      <span class="tgt tgt-warn" id="otif-real">REALIZADO: 93,98%</span>
-    </div>
-  </div>
-  <div class="g3">
-    <div class="card no-mb" id="ch-ot-sp"></div>
-    <div class="card no-mb" id="ch-ot-rj"></div>
-    <div class="card no-mb" id="ch-ot-pe"></div>
-  </div>
-</div>
-
-<!-- ═══════════ PAGE: COMPLAINTS ═══════════ -->
-<div id="page-complaints" class="page">
-  <div class="ph">
-    <div><h1>Complaints Logística</h1><p>403 = Inversão &nbsp;·&nbsp; 404 = Falta</p></div>
-    <div class="target-wrap">
-      <span class="tgt tgt-gray">TARGET: 0,14%</span>
-      <span class="tgt tgt-bad" id="comp-real">REALIZADO: 0,144%</span>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="card no-mb" id="ch-co-sp"></div>
-    <div class="card no-mb" id="ch-co-rj"></div>
-  </div>
-  <div class="g2" style="margin-top:14px">
-    <div class="card no-mb" id="ch-co-pe"></div>
-    <div class="card no-mb" id="ch-co-dark"></div>
-  </div>
-</div>
-
-<!-- ═══════════ PAGE: ESTOQUE ═══════════ -->
-<div id="page-estoque" class="page">
-  <div class="ph"><div><h1>Estoque</h1><p>Valor consolidado por armazém e tipo de produto.</p></div></div>
-  <div class="card">
-    <div class="card-head"><div><div class="card-title">Valor Total por Armazém</div><div class="card-sub" id="est-total-sub"></div></div></div>
-    <div class="chart-box" style="height:200px"><canvas id="ch-est-arm" role="img" aria-label="valor total por armazém"></canvas></div>
-  </div>
-  <div class="card no-mb">
-    <div class="card-head"><div class="card-title">Indicadores por Tipo de Produto</div></div>
-    <div class="est-grid" id="est-cards"></div>
   </div>
 </div>
 
 <script>
-// ════════════════════════════════════
-// DATA
-// ════════════════════════════════════
+// ════════ DATA ════════
 const UN = {
   SP:{nome:'CD SP',cidade:'São Paulo',
     kpis:{int_total:5586,backlog:248,int_00h:4650,exp_00h:5137},
+    sla:67.14, meta:85,
     transp:[
-      {n:'Correios',c:'15h00',total:1138,exp:835, pend:303, pct:73.37},
-      {n:'Fast',    c:'15h00',total:91,  exp:72,  pend:19,  pct:79.12},
-      {n:'RN',      c:'18h00',total:687, exp:313, pend:374, pct:45.56},
-      {n:'Dialogo', c:'20h00',total:1234,exp:1031,pend:203, pct:83.55},
-      {n:'Logan',   c:'20h40',total:1183,exp:992, pend:191, pct:83.85},
-      {n:'Dissudes',c:'21h00',total:2512,exp:1353,pend:1159,pct:53.86},
+      {n:'Correios',c:'15h',total:1138,exp:835, b2b:200,b2c:635,pct:73.37},
+      {n:'Fast',    c:'15h',total:91,  exp:72,  b2b:20, b2c:52, pct:79.12},
+      {n:'RN',      c:'18h',total:687, exp:313, b2b:80, b2c:233,pct:45.56},
+      {n:'Dialogo', c:'20h',total:1234,exp:1031,b2b:300,b2c:731,pct:83.55},
+      {n:'Logan',   c:'20h',total:1183,exp:992, b2b:250,b2c:742,pct:83.85},
+      {n:'Dissudes',c:'21h',total:2512,exp:1353,b2b:75, b2c:1278,pct:53.86},
     ],
     canais:[
-      {c:'B2B',total:864, fin:425, pend:439, pct:49.19,sub:[
-        {l:'04/05/2026',total:602, fin:398, pend:204, pct:66.11},
-        {l:'05/05/2026',total:262, fin:27,  pend:235, pct:10.31}]},
-      {c:'B2C',total:5973,fin:4171,pend:1802,pct:69.83,sub:[
-        {l:'04/05/2026',total:4042,fin:3486,pend:556, pct:86.24},
-        {l:'05/05/2026',total:1931,fin:685, pend:1246,pct:35.47}]},
-      {c:'Não Class.',total:8,fin:0,pend:8,pct:0,sub:[
-        {l:'05/05/2026',total:8,fin:0,pend:8,pct:0}]},
+      {c:'B2B',total:864, fin:425,pct:49.19,sub:[{l:'04/05',total:602,fin:398,pct:66.11},{l:'05/05',total:262,fin:27,pct:10.31}]},
+      {c:'B2C',total:5973,fin:4171,pct:69.83,sub:[{l:'04/05',total:4042,fin:3486,pct:86.24},{l:'05/05',total:1931,fin:685,pct:35.47}]},
+      {c:'Não Class.',total:8,fin:0,pct:0,sub:[]},
     ],
     hh:[
-      {h:'04/05',b2b:466,b2c:4669,tot:5135},
-      {h:'05/05',b2b:69, b2c:1418,tot:1487},
-      {h:'06:00',b2b:0,  b2c:88,  tot:88},
-      {h:'07:00',b2b:0,  b2c:161, tot:161},
-      {h:'08:00',b2b:0,  b2c:293, tot:293},
-      {h:'09:00',b2b:40, b2c:435, tot:475},
-      {h:'10:00',b2b:28, b2c:359, tot:387},
-      {h:'11:00',b2b:1,  b2c:82,  tot:83},
-    ],
-    int12:[
-      {n:'Correios',c:'15h00',total:1137,exp:835, pend:302, pct:73.44},
-      {n:'Fast',    c:'15h00',total:91,  exp:72,  pend:19,  pct:79.12},
-      {n:'RN',      c:'18h00',total:682, exp:313, pend:369, pct:45.89},
-      {n:'Dialogo', c:'20h00',total:1233,exp:1031,pend:202, pct:83.62},
-      {n:'Logan',   c:'20h40',total:1181,exp:992, pend:189, pct:84.00},
-      {n:'Dissudes',c:'21h00',total:2512,exp:1353,pend:1159,pct:53.86},
+      {h:'06h',b2b:0,  b2c:88,  tot:88},
+      {h:'07h',b2b:0,  b2c:161, tot:161},
+      {h:'08h',b2b:0,  b2c:293, tot:293},
+      {h:'09h',b2b:40, b2c:435, tot:475},
+      {h:'10h',b2b:28, b2c:359, tot:387},
+      {h:'11h',b2b:1,  b2c:82,  tot:83},
+      {h:'12h',b2b:20, b2c:310, tot:330},
+      {h:'13h',b2b:45, b2c:520, tot:565},
+      {h:'14h',b2b:60, b2c:680, tot:740},
+      {h:'15h',b2b:231,b2c:2412,tot:2643},
     ],
   },
   RJ:{nome:'CD RJ',cidade:'Rio de Janeiro',
-    kpis:{int_total:354,backlog:0,int_00h:354,exp_00h:0},
+    kpis:{int_total:354,backlog:0,int_00h:354,exp_00h:0},sla:0,meta:85,
     transp:[
-      {n:'Correios',c:'15h00',total:18, exp:0,pend:18, pct:0},
-      {n:'Fast',    c:'15h00',total:307,exp:0,pend:307,pct:0},
-      {n:'RN',      c:'18h00',total:29, exp:0,pend:29, pct:0},
+      {n:'Correios',c:'15h',total:18, exp:0,b2b:0,b2c:0,pct:0},
+      {n:'Fast',    c:'15h',total:307,exp:0,b2b:0,b2c:0,pct:0},
+      {n:'RN',      c:'18h',total:29, exp:0,b2b:0,b2c:0,pct:0},
     ],
     canais:[
-      {c:'B2C',total:321,fin:0,pend:321,pct:0,sub:[
-        {l:'05/05/2026',total:276,fin:0,pend:276,pct:0},
-        {l:'04/05/2026',total:45, fin:0,pend:45, pct:0}]},
-      {c:'B2B',total:33,fin:0,pend:33,pct:0,sub:[
-        {l:'05/05/2026',total:33,fin:0,pend:33,pct:0}]},
+      {c:'B2C',total:321,fin:0,pct:0,sub:[]},
+      {c:'B2B',total:33, fin:0,pct:0,sub:[]},
     ],
-    hh:[{h:'Total',b2b:0,b2c:0,tot:0}],
-    int12:[
-      {n:'Correios',c:'15h00',total:18, exp:0,pend:18, pct:0},
-      {n:'Fast',    c:'15h00',total:262,exp:0,pend:262,pct:0},
-      {n:'RN',      c:'18h00',total:29, exp:0,pend:29, pct:0},
-    ],
+    hh:[{h:'15h',b2b:0,b2c:0,tot:0}],
   },
   PE:{nome:'CD PE',cidade:'Recife',
-    kpis:{int_total:528,backlog:0,int_00h:299,exp_00h:299},
+    kpis:{int_total:528,backlog:0,int_00h:299,exp_00h:299},sla:56.63,meta:85,
     transp:[
-      {n:'Correios',   c:'04/05',total:134,exp:134,pend:0,  pct:100},
-      {n:'Log Servico',c:'04/05',total:165,exp:165,pend:0,  pct:100},
-      {n:'Log Servico',c:'05/05',total:229,exp:0,  pend:229,pct:0},
+      {n:'Correios',   c:'04/05',total:134,exp:134,b2b:21,b2c:113,pct:100},
+      {n:'Log Servico',c:'04/05',total:165,exp:165,b2b:0, b2c:165,pct:100},
+      {n:'Log Servico',c:'05/05',total:229,exp:0,  b2b:0, b2c:0,  pct:0},
     ],
     canais:[
-      {c:'B2C',total:507,fin:278,pend:229,pct:54.83,sub:[
-        {l:'05/05/2026',total:229,fin:0,  pend:229,pct:0},
-        {l:'04/05/2026',total:278,fin:278,pend:0,  pct:100}]},
-      {c:'B2B',total:21,fin:21,pend:0,pct:100,sub:[
-        {l:'04/05/2026',total:21,fin:21,pend:0,pct:100}]},
+      {c:'B2C',total:507,fin:278,pct:54.83,sub:[]},
+      {c:'B2B',total:21, fin:21, pct:100,  sub:[]},
     ],
-    hh:[{h:'15:00',b2b:21,b2c:278,tot:299},{h:'Total',b2b:21,b2c:278,tot:299}],
-    int12:[
-      {n:'Correios',   c:'04/05',total:134,exp:134,pend:0,  pct:100},
-      {n:'Log Servico',c:'04/05',total:165,exp:165,pend:0,  pct:100},
-      {n:'Log Servico',c:'05/05',total:0,  exp:0,  pend:0,  pct:0},
-    ],
+    hh:[{h:'15h',b2b:21,b2c:278,tot:299}],
   },
   DARK:{nome:'Dark Store',cidade:'BSB + POA',
-    kpis:{int_total:468,backlog:0,int_00h:315,exp_00h:315},
+    kpis:{int_total:468,backlog:0,int_00h:315,exp_00h:315},sla:67.31,meta:85,
     transp:[
-      {n:'Dialogo',c:'04/05',total:315,exp:315,pend:0,  pct:100},
-      {n:'Dialogo',c:'05/05',total:153,exp:0,  pend:153,pct:0},
+      {n:'Dialogo',c:'04/05',total:315,exp:315,b2b:0,b2c:315,pct:100},
+      {n:'Dialogo',c:'05/05',total:153,exp:0,  b2b:0,b2c:0,  pct:0},
     ],
     canais:[
-      {c:'B2C',total:468,fin:315,pend:153,pct:67.31,sub:[
-        {l:'05/05/2026',total:153,fin:0,  pend:153,pct:0},
-        {l:'04/05/2026',total:315,fin:315,pend:0,  pct:100}]},
+      {c:'B2C',total:468,fin:315,pct:67.31,sub:[]},
     ],
-    hh:[{h:'15:00',b2b:0,b2c:315,tot:315},{h:'Total',b2b:0,b2c:315,tot:315}],
-    int12:[
-      {n:'Dialogo',c:'04/05',total:315,exp:315,pend:0,pct:100},
-      {n:'Dialogo',c:'05/05',total:0,  exp:0,  pend:0,pct:0},
-    ],
+    hh:[{h:'15h',b2b:0,b2c:315,tot:315}],
   }
 };
 
-const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-
-const BL = {
-  b2b:[
-    {d:'03/mai - dom',p:196, i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'04/mai - seg',p:501, i:346, v:-30.94, bl:2,  pb:0.58,i0:603, e0:466},
-    {d:'05/mai - ter',p:406, i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'06/mai - qua',p:525, i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'07/mai - qui',p:386, i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'08/mai - sex',p:316, i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'09/mai - sáb',p:61,  i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-  ],
-  b2c:[
-    {d:'03/mai - dom',p:1089,i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'04/mai - seg',p:3615,i:5240,v:44.95,  bl:246,pb:4.69,i0:4047,e0:4671},
-    {d:'05/mai - ter',p:2816,i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:212},
-    {d:'06/mai - qua',p:2514,i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'07/mai - qui',p:3028,i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'08/mai - sex',p:3111,i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-    {d:'09/mai - sáb',p:1740,i:0,   v:-100,   bl:0,  pb:null,i0:0,   e0:null},
-  ],
-  hist:{
-    SP:  {y24:[0.04,0.78,3.40,0.04,6.60,5.29,5.90,1.87,0.17,0.13,1.33,10.66],y25:[17.9,22.9,16.1,6.3,1.8,1.8,1.8,3.3,1.7,1.5,1.0,0.63],y26:[0.12,0.37,0.13],t:0.80},
-    RJ:  {y24:[1.3,0,0,0,0,0,6.2,0,0.2,1.1,0.3,0],y25:[74.6,61.7,12.0,1.8,10.9,0,0,0,0,0,0,0],y26:[0,0,0],t:0.80},
-    PE:  {y24:[3.69,0,0,0.89,0.02,0,0,0,0,0,0.1,0],y25:[0,0,0,0,0,0,0,0,0,0,0,0],y26:[0,0,0],t:0.80},
-    DARK:{y24:Array(12).fill(null),y25:[0.27,0.27,0.46,0.08,0,0,0,0,0,2.64,31.30,0],y26:[0,0,0],t:0.80},
-  }
-};
-
-const OTIF = {
-  SP:  {y24:[99,99,98,98,97,98,98,96,98,98,93,95],y25:[11.75,60.67,75.39,59.95,78.29,79.70,89.67,91.38,90.62,90.49,91.09,89.73],y26:[89,91.56,92.46],t:97},
-  RJ:  {y24:[100,100,100,100,99,100,100,100,100,100,100,100],y25:[100,100,100,100,99,100,100,98,100,100,100,100],y26:[100,100,100],t:97},
-  PE:  {y24:[98,97,100,99,97,99,97,95,100,99,94,96],y25:[96,100,100,100,100,100,100,100,97,98,100,100],y26:[95.90,95,98.57],t:97},
-};
-
-const COMP = {
-  SP:  {y24:[0.13,0.13,0.17,0.16,0.24,0.25,0.19,0.12,0.14,0.12,0.12,0.13],y25:[1.16,1.48,0.69,1.17,0.92,0.33,0.28,0.48,0.30,0.30,0.39,0.30],y26:[0.23,0.138,0.139],t:0.14},
-  RJ:  {y24:[0.04,0.05,0.09,0.04,0.04,0.07,0.11,0.13,0.05,0,0.02,0.05],y25:[0.04,0.13,0.04,0.02,0.05,0.04,0.01,0.01,0.02,0.05,0.02,0.02],y26:[0.11,0.18,0.10],t:0.14},
-  PE:  {y24:[0,0,0,0,0.05,0.06,0.02,0.07,0.02,0.03,0.10,0.10],y25:[0.08,0,0,0,0,0,0,0,0.20,0.19,0.10,0.12],y26:[0.10,0,0.03],t:0.14},
-  DARK:{y24:Array(12).fill(null),y25:[0.48,0.47,0.39,0.19,0.28,0.46,0.40,0.45,0.46,0.38,0.55,0.92],y26:[0.87,0.54,0.50],t:0.14},
-};
-
-const EST = {
-  total:9195315.62,
-  arm:[
-    {cod:'2A', v:3403705.13},{cod:'3OA',v:1904695.87},{cod:'3SA',v:1423011.78},
-    {cod:'3TA',v:1216093.30},{cod:'3XA',v:935500.80},{cod:'3AV',v:272390.45},{cod:'2AC',v:36511.25},
-  ],
-  prod:[
-    {n:'MACHINES',        v:4695064.89,it:360, sh:51.1,d:0.0},
-    {n:'CAPSULES',        v:3616813.70,it:1013,sh:39.3,d:0.2},
-    {n:'LES COLLECTIONS', v:735413.07, it:460, sh:8.0, d:0.0},
-    {n:'MILK DEVICES',    v:102424.68, it:19,  sh:1.1, d:null},
-    {n:'SPARE PARTS',     v:41160.78,  it:91,  sh:0.4, d:0.0},
-    {n:'FOODS & BITES',   v:4398.24,   it:3,   sh:0.0, d:null},
-    {n:'POSM MATERIAL',   v:0.37,      it:14,  sh:0.0, d:null},
-    {n:'Printed Material',v:0.30,      it:11,  sh:0.0, d:7.1},
-    {n:'Packaging Mat.',  v:0.27,      it:3,   sh:0.0, d:null},
-  ]
-};
-
-// ════════════════════════════════════
-// HELPERS
-// ════════════════════════════════════
+// ════════ HELPERS ════════
 const f  = n => (+n||0).toLocaleString('pt-BR');
-const fr = n => 'R$ '+(+n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fp = (n,d=2) => n==null?'—':(+n).toFixed(d).replace('.',',')+'\u200b%';
+const sum = (arr,k) => arr.reduce((a,r)=>a+(r[k]||0),0);
 
-function pb(p, thr=80, thr2=50) {
-  if(p==null||p==='') return '<span class="pct p0">—</span>';
-  const cls = p>=thr?'pg':p>=thr2?'pa':'pr';
+function pctBadge(p){
+  if(p==null) return '<span class="pct p0">—</span>';
+  const cls = p>=80?'pg':p>=50?'pa':'pr';
   return `<span class="pct ${cls}">${fp(p,2)}</span>`;
 }
 
-function sum(arr,k){return arr.reduce((a,r)=>a+(r[k]||0),0)}
-
-// ════════════════════════════════════
-// NAV
-// ════════════════════════════════════
-function goPage(id,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.np').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  el.classList.add('active');
+function heatColor(pct){
+  if(pct>=85) return {bg:'#d1fae5',color:'#065f46'};
+  if(pct>=70) return {bg:'#dcfce7',color:'#166534'};
+  if(pct>=50) return {bg:'#fef9c3',color:'#854d0e'};
+  if(pct>=25) return {bg:'#fed7aa',color:'#9a3412'};
+  if(pct>0)   return {bg:'#fee2e2',color:'#7f1d1d'};
+  return {bg:'#f1f5f9',color:'#94a3b8'};
 }
 
-// ════════════════════════════════════
-// CARTEIRA
-// ════════════════════════════════════
-let chTransp=null;
-function renderCarteira(){
-  const d=UN[document.getElementById('sel-un').value];
-  document.getElementById('cart-sub').textContent=`${d.nome} · ${d.cidade}`;
-
-  // KPIs
-  document.getElementById('kpis-cart').innerHTML=`
-    <div class="kpi kpi-blue"><div class="kpi-lbl">Integração Total D-1</div><div class="kpi-val">${f(d.kpis.int_total)}</div><div class="kpi-sub">pedidos integrados</div></div>
-    <div class="kpi kpi-red"><div class="kpi-lbl">Backlog Total</div><div class="kpi-val">${f(d.kpis.backlog)}</div><div class="kpi-sub">pedidos em atraso</div></div>
-    <div class="kpi kpi-green"><div class="kpi-lbl">Integração 00h</div><div class="kpi-val">${f(d.kpis.int_00h)}</div><div class="kpi-sub">pedidos</div></div>
-    <div class="kpi kpi-amber"><div class="kpi-lbl">Expedição 00h</div><div class="kpi-val">${f(d.kpis.exp_00h)}</div><div class="kpi-sub">pedidos expedidos</div></div>`;
-
-  // Transp
-  const tT={total:sum(d.transp,'total'),exp:sum(d.transp,'exp'),pend:sum(d.transp,'pend')};
-  const tTp=tT.total?+(tT.exp/tT.total*100).toFixed(2):0;
-  // Canal
-  const tC={total:sum(d.canais,'total'),fin:sum(d.canais,'fin'),pend:sum(d.canais,'pend')};
-  const tCp=tC.total?+(tC.fin/tC.total*100).toFixed(2):0;
-
-  document.getElementById('g-transp-canal').innerHTML=`
-    <div class="card no-mb">
-      <div class="card-head"><div><div class="card-title">Por Transportadora</div></div></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Transportadora</th><th>Corte</th><th class="r">Total</th><th class="r">Expedido</th><th class="r">Pendente</th><th class="r">% Finalizado</th></tr></thead>
-        <tbody>
-          ${d.transp.map(r=>`<tr><td class="bold">${r.n}</td><td style="color:var(--muted)">${r.c}</td><td class="r">${f(r.total)}</td><td class="r">${f(r.exp)}</td><td class="r">${f(r.pend)}</td><td class="r">${pb(r.pct)}</td></tr>`).join('')}
-          <tr class="total"><td colspan="2">Total</td><td class="r">${f(tT.total)}</td><td class="r">${f(tT.exp)}</td><td class="r">${f(tT.pend)}</td><td class="r">${pb(tTp)}</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-    <div class="card no-mb">
-      <div class="card-head"><div><div class="card-title">Por Canal</div></div></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Canal</th><th class="r">Total</th><th class="r">Finalizado</th><th class="r">Pendente</th><th class="r">% Finalizado</th></tr></thead>
-        <tbody>
-          ${d.canais.map(r=>`
-            <tr><td class="bold">${r.c}</td><td class="r bold">${f(r.total)}</td><td class="r bold">${f(r.fin)}</td><td class="r bold">${f(r.pend)}</td><td class="r">${pb(r.pct)}</td></tr>
-            ${r.sub.map(s=>`<tr class="sub"><td>${s.l}</td><td class="r">${f(s.total)}</td><td class="r">${f(s.fin)}</td><td class="r">${f(s.pend)}</td><td class="r">${pb(s.pct)}</td></tr>`).join('')}
-          `).join('')}
-          <tr class="total"><td>Total</td><td class="r">${f(tC.total)}</td><td class="r">${f(tC.fin)}</td><td class="r">${f(tC.pend)}</td><td class="r">${pb(tCp)}</td></tr>
-        </tbody>
-      </table></div>
+// ════════ GAUGE SVG ════════
+function drawGauge(containerId, pct, label, color, meta){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const clamp = Math.min(Math.max(pct,0),100);
+  const metaClamp = Math.min(Math.max(meta,0),100);
+  // Arc params
+  const cx=90,cy=95,r=70;
+  const startAngle = Math.PI; // 180deg
+  const endAngle   = 2*Math.PI; // 360deg
+  const toXY = (angle) => [cx + r*Math.cos(angle), cy + r*Math.sin(angle)];
+  const pctAngle = startAngle + (clamp/100)*(endAngle-startAngle);
+  const metaAngle = startAngle + (metaClamp/100)*(endAngle-startAngle);
+  const [px,py] = toXY(pctAngle);
+  const [mx,my] = toXY(metaAngle);
+  const lgFlag = clamp>50?1:0;
+  const metaFlag = metaClamp>50?1:0;
+  el.innerHTML = `
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 180 100">
+        <!-- bg arc -->
+        <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}" fill="none" stroke="#f1f5f9" stroke-width="12" stroke-linecap="round"/>
+        <!-- value arc -->
+        <path d="M ${cx-r} ${cy} A ${r} ${r} 0 ${lgFlag} 1 ${px.toFixed(1)} ${py.toFixed(1)}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round"/>
+        <!-- meta marker -->
+        <line x1="${mx.toFixed(1)}" y1="${my.toFixed(1)}" x2="${(cx+(r+8)*Math.cos(metaAngle)).toFixed(1)}" y2="${(cy+(r+8)*Math.sin(metaAngle)).toFixed(1)}" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+        <!-- value text -->
+        <text x="${cx}" y="${cy-8}" class="gauge-val" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:22px;fill:${color}">${fp(clamp,1)}</text>
+        <text x="${cx}" y="${cy+10}" class="gauge-lbl" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;fill:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.05em">${label}</text>
+      </svg>
+      <div class="gauge-meta">
+        <div class="gauge-item"><div class="gauge-item-val" style="color:${color}">${fp(clamp,1)}</div><div class="gauge-item-lbl">Realizado</div></div>
+        <div class="gauge-item"><div class="gauge-item-val" style="color:#ef4444">${fp(meta,0)}</div><div class="gauge-item-lbl">Meta</div></div>
+      </div>
     </div>`;
+}
 
-  // HH + Int12
-  const tHH={b2b:sum(d.hh,'b2b'),b2c:sum(d.hh,'b2c'),tot:sum(d.hh,'tot')};
-  const tI={total:sum(d.int12,'total'),exp:sum(d.int12,'exp'),pend:sum(d.int12,'pend')};
-  const tIp=tI.total?+(tI.exp/tI.total*100).toFixed(2):0;
+// ════════ CHARTS ════════
+let chB2b=null, chHH=null;
 
-  document.getElementById('g-hh-int').innerHTML=`
-    <div class="card no-mb">
-      <div class="card-head"><div class="card-title">Hora × Hora — Expedição</div></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Hora</th><th class="r">B2B</th><th class="r">B2C</th><th class="r">Total</th></tr></thead>
-        <tbody>
-          ${d.hh.map(r=>`<tr><td>${r.h}</td><td class="r">${r.b2b||'—'}</td><td class="r">${f(r.b2c)}</td><td class="r bold">${f(r.tot)}</td></tr>`).join('')}
-          <tr class="total"><td>Total</td><td class="r">${f(tHH.b2b)}</td><td class="r">${f(tHH.b2c)}</td><td class="r">${f(tHH.tot)}</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-    <div class="card no-mb">
-      <div class="card-head"><div><div class="card-title">Integração até 12h</div></div></div>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>Transportadora</th><th>Corte</th><th class="r">Total</th><th class="r">Expedido</th><th class="r">Pendente</th><th class="r">% Finalizado</th></tr></thead>
-        <tbody>
-          ${d.int12.map(r=>`<tr><td class="bold">${r.n}</td><td style="color:var(--muted)">${r.c}</td><td class="r">${f(r.total)}</td><td class="r">${f(r.exp)}</td><td class="r">${f(r.pend)}</td><td class="r">${pb(r.pct)}</td></tr>`).join('')}
-          <tr class="total"><td colspan="2">Total</td><td class="r">${f(tI.total)}</td><td class="r">${f(tI.exp)}</td><td class="r">${f(tI.pend)}</td><td class="r">${pb(tIp)}</td></tr>
-        </tbody>
-      </table></div>
-    </div>`;
-
-  // Chart transportadora
-  if(chTransp) chTransp.destroy();
-  chTransp=new Chart(document.getElementById('ch-transp').getContext('2d'),{
+function buildCharts(d){
+  // B2B vs B2C stacked bar
+  if(chB2b) chB2b.destroy();
+  const ctxB = document.getElementById('ch-b2b-b2c').getContext('2d');
+  chB2b = new Chart(ctxB,{
     type:'bar',
     data:{
-      labels:d.transp.map(r=>`${r.n} (${r.c})`),
+      labels: d.transp.map(t=>t.n),
       datasets:[
-        {label:'% Finalizado',data:d.transp.map(r=>r.pct),
-         backgroundColor:d.transp.map(r=>r.pct>=80?'#16a34a':r.pct>=50?'#d97706':'#dc2626'),
-         borderRadius:5,borderSkipped:false},
-        {label:'Meta 70%',data:d.transp.map(()=>70),type:'line',
-         borderColor:'#1A56DB',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false},
+        {label:'B2B', data:d.transp.map(t=>t.b2b), backgroundColor:'#2563eb', borderRadius:{topLeft:4,topRight:4,bottomLeft:0,bottomRight:0}, stack:'s'},
+        {label:'B2C', data:d.transp.map(t=>t.b2c), backgroundColor:'#93c5fd', borderRadius:{topLeft:0,topRight:0,bottomLeft:4,bottomRight:4}, stack:'s'},
       ]
     },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{y:{min:0,max:105,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},
-              x:{ticks:{font:{size:10}},grid:{display:false}}}}
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${f(c.raw)}`}}},
+      scales:{
+        y:{stacked:true,ticks:{font:{size:10},color:'#94a3b8'},grid:{color:'rgba(0,0,0,.04)'}},
+        x:{stacked:true,ticks:{font:{size:10},color:'#64748b'},grid:{display:false}}
+      }
+    }
   });
-}
+  document.getElementById('leg-b2b-b2c').innerHTML=`
+    <div class="cl-item"><div class="cl-dot" style="background:#2563eb"></div>B2B</div>
+    <div class="cl-item"><div class="cl-dot" style="background:#93c5fd"></div>B2C</div>`;
 
-// ════════════════════════════════════
-// BACKLOG
-// ════════════════════════════════════
-function renderBacklog(){
-  ['b2b','b2c'].forEach(tipo=>{
-    const rows=BL[tipo];
-    const tot={p:sum(rows,'p'),i:sum(rows,'i'),bl:sum(rows,'bl')};
-    document.querySelector(`#tbl-${tipo} tbody`).innerHTML=
-      rows.map(r=>`<tr>
-        <td>${r.d}</td><td class="r">${f(r.p)}</td>
-        <td class="r">${r.i||'—'}</td>
-        <td class="r ${r.v<0?'neg':'pos'}">${fp(r.v,2)}</td>
-        <td class="r ${r.bl>0?'bl':''}">${r.bl||'0'}</td>
-        <td class="r">${r.pb!=null?fp(r.pb,2):'—'}</td>
-        <td class="r">${r.i0||'—'}</td>
-        <td class="r">${r.e0||'—'}</td>
-      </tr>`).join('')+
-      `<tr class="total"><td>Total</td><td class="r">${f(tot.p)}</td><td class="r">${f(tot.i)}</td><td class="r">—</td><td class="r bl">${f(tot.bl)}</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>`;
-  });
-  [{id:'ch-bl-sp',t:'Backlog — SP',k:'SP'},{id:'ch-bl-rj',t:'Backlog — RJ',k:'RJ'},
-   {id:'ch-bl-pe',t:'Backlog — PE',k:'PE'},{id:'ch-bl-dark',t:'Backlog — Dark Store',k:'DARK'}]
-  .forEach(c=>histChart(c.id,c.t,BL.hist[c.k],true));
-}
-
-// ════════════════════════════════════
-// OTIF
-// ════════════════════════════════════
-function renderOtif(){
-  [{id:'ch-ot-sp',t:'OTIF — SP',k:'SP'},{id:'ch-ot-rj',t:'OTIF — RJ',k:'RJ'},{id:'ch-ot-pe',t:'OTIF — PE',k:'PE'}]
-  .forEach(c=>histChart(c.id,c.t,OTIF[c.k],false));
-}
-
-// ════════════════════════════════════
-// COMPLAINTS
-// ════════════════════════════════════
-function renderComplaints(){
-  [{id:'ch-co-sp',t:'Complaints — SP',k:'SP'},{id:'ch-co-rj',t:'Complaints — RJ',k:'RJ'},
-   {id:'ch-co-pe',t:'Complaints — PE',k:'PE'},{id:'ch-co-dark',t:'Complaints — Dark Store',k:'DARK'}]
-  .forEach(c=>histChart(c.id,c.t,COMP[c.k],true));
-}
-
-// ════════════════════════════════════
-// HIST CHART (CSS bars)
-// ════════════════════════════════════
-function histChart(containerId,title,data,invertOk){
-  const el=document.getElementById(containerId);
-  if(!el) return;
-  const allV=[...data.y24,...data.y25,...data.y26].filter(v=>v!=null&&v>=0);
-  const maxV=Math.max(...allV,data.t*1.3)||1;
-  const tH=Math.round(data.t/maxV*100);
-
-  const groups=MESES.map((m,i)=>{
-    const bars=[
-      {v:data.y24[i],cls:'b24'},{v:data.y25[i],cls:'b25'},{v:data.y26[i],cls:'b26'}
-    ].map(b=>{
-      if(b.v==null||b.v<0) return '';
-      const h=Math.max(Math.round(b.v/maxV*100),b.v>0?2:0);
-      return `<div class="hbar ${b.cls}" style="height:${h}px" title="${b.v}"></div>`;
-    }).join('');
-    const v26=data.y26[i];
-    return `<div class="hist-group">
-      <div class="hval">${v26!=null?v26:''}</div>
-      <div style="display:flex;gap:1px;align-items:flex-end;height:100px;justify-content:center">${bars}</div>
-      <div class="hlbl">${m}</div>
-    </div>`;
-  }).join('');
-
-  el.innerHTML=`
-    <div class="card-head"><div class="card-title">${title}</div></div>
-    <div class="hist-chart">
-      <div style="position:relative">
-        <div class="hist-bars" style="height:120px">
-          ${groups}
-          <div class="target-line" style="bottom:${tH}px"><span class="target-lbl">${data.t}</span></div>
-        </div>
-      </div>
-      <div class="hist-legend" style="margin-top:8px">
-        <div class="hl-item"><div class="hl-dot b24"></div>2024</div>
-        <div class="hl-item"><div class="hl-dot b25"></div>2025</div>
-        <div class="hl-item"><div class="hl-dot b26"></div>2026</div>
-        <div class="hl-item"><div style="width:16px;border-top:2px dashed var(--red)"></div>Target ${data.t}</div>
-      </div>
-    </div>`;
-}
-
-// ════════════════════════════════════
-// ESTOQUE
-// ════════════════════════════════════
-let chEstArm=null;
-function renderEstoque(){
-  document.getElementById('est-total-sub').textContent=`Total ${fr(EST.total)} · todos os armazéns`;
-
-  if(chEstArm) chEstArm.destroy();
-  chEstArm=new Chart(document.getElementById('ch-est-arm').getContext('2d'),{
-    type:'bar',
+  // Hora a hora line
+  if(chHH) chHH.destroy();
+  const ctxH = document.getElementById('ch-hh').getContext('2d');
+  const hh = d.hh.filter(h=>h.tot>0);
+  // Acumulado
+  let acc=0;
+  const accData = hh.map(h=>{acc+=h.tot;return acc;});
+  chHH = new Chart(ctxH,{
+    type:'line',
     data:{
-      labels:EST.arm.map(a=>a.cod),
-      datasets:[{
-        label:'Valor (R$)',
-        data:EST.arm.map(a=>a.v),
-        backgroundColor:'#b8973a',
-        borderRadius:5,borderSkipped:false,
-      }]
+      labels: hh.map(h=>h.h),
+      datasets:[
+        {label:'Acumulado',data:accData,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:'#2563eb',pointBorderWidth:2},
+        {label:'Por hora', data:hh.map(h=>h.tot),borderColor:'#93c5fd',backgroundColor:'transparent',fill:false,tension:.4,pointRadius:3,pointBackgroundColor:'#93c5fd',borderDash:[4,3]},
+      ]
     },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' R$ '+(+c.raw).toLocaleString('pt-BR',{minimumFractionDigits:0})}}},
-      scales:{y:{ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},
-              x:{ticks:{font:{size:11,weight:'600'}},grid:{display:false}}}}
-  });
-
-  document.getElementById('est-cards').innerHTML=EST.prod.map(p=>`
-    <div class="est-card">
-      <div class="est-card-name"><div class="est-dot"></div>${p.n}</div>
-      <div class="est-val">${fr(p.v)}</div>
-      <div class="est-meta">
-        <span class="est-itens">${f(p.it)} itens</span>
-        <span class="est-share">Share: ${p.sh}%</span>
-        ${p.d!=null?`<span class="est-delta ${p.d>0?'delta-up':'delta-flat'}">+${p.d}%</span>`:`<span style="font-size:10px;color:var(--subtle)">Sem histórico</span>`}
-      </div>
-      <div class="est-bar-wrap"><div class="est-bar" style="width:${p.sh}%"></div></div>
-    </div>`).join('');
-}
-
-// ════════════════════════════════════
-// SUPABASE CONFIG
-// ════════════════════════════════════
-// ── CREDENCIAIS SUPABASE ──────────────────────────────────
-// Cole aqui sua URL e anon key para conectar automaticamente
-// Use APENAS a anon key (nunca a service_role key neste arquivo)
-const SB_URL_DEFAULT = 'https://SEU_PROJETO.supabase.co'; // ← substitua
-const SB_KEY_DEFAULT = 'SUA_ANON_KEY_AQUI';               // ← substitua
-
-let SB_URL = localStorage.getItem('ct_sb_url') || SB_URL_DEFAULT;
-let SB_KEY  = localStorage.getItem('ct_sb_key') || SB_KEY_DEFAULT;
-let sbConfigured = !!(SB_URL && SB_KEY && !SB_URL.includes('SEU_PROJETO'));
-
-// Injetar banner de configuração no topo
-(function injectConfigBanner(){
-  const banner = document.createElement('div');
-  banner.id='sb-banner';
-  banner.style.cssText=`background:#fff8e1;border-bottom:1px solid #f59e0b55;padding:9px 28px;display:flex;align-items:center;gap:10px;font-size:12px;color:#92400e;${sbConfigured?'display:none!important':''}`;
-  banner.innerHTML=`
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    Exibindo dados de demonstração. Configure o Supabase para dados reais.
-    <button onclick="toggleSbForm()" style="background:none;border:none;color:#1A56DB;font-size:12px;cursor:pointer;text-decoration:underline;padding:0">Configurar agora</button>
-    <button onclick="document.getElementById('sb-banner').style.display='none'" style="margin-left:auto;background:none;border:none;color:#92400e;cursor:pointer;font-size:16px;line-height:1">×</button>`;
-
-  const form = document.createElement('div');
-  form.id='sb-form';
-  form.style.cssText='display:none;background:#fff;border-bottom:1px solid #e5e7eb;padding:14px 28px;gap:12px;align-items:flex-end;flex-wrap:wrap';
-  form.innerHTML=`
-    <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:#6b7280">
-      URL do Supabase
-      <input id="sb-url-in" type="text" placeholder="https://xxxx.supabase.co" value="${SB_URL}"
-        style="width:300px;border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:#111827">
-    </label>
-    <label style="display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:#6b7280">
-      Anon Key (chave pública)
-      <input id="sb-key-in" type="password" placeholder="eyJhbGciOiJIUzI1NiIs..." value="${SB_KEY}"
-        style="width:340px;border:1px solid #d1d5db;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;color:#111827">
-    </label>
-    <button onclick="saveSbConfig()" style="background:#1A56DB;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Salvar e conectar</button>
-    <button onclick="clearSbConfig()" style="background:none;border:1px solid #d1d5db;color:#6b7280;border-radius:7px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:inherit">Limpar</button>
-    <span id="sb-status" style="font-size:12px;color:#6b7280"></span>`;
-
-  document.body.insertBefore(form, document.body.firstChild);
-  document.body.insertBefore(banner, document.body.firstChild);
-  if(sbConfigured) banner.style.display='none';
-})();
-
-function toggleSbForm(){
-  const f=document.getElementById('sb-form');
-  f.style.display=f.style.display==='none'?'flex':'none';
-}
-function saveSbConfig(){
-  SB_URL=document.getElementById('sb-url-in').value.trim().replace(/\/$/,'');
-  SB_KEY=document.getElementById('sb-key-in').value.trim();
-  if(!SB_URL||!SB_KEY){document.getElementById('sb-status').textContent='⚠ Preencha os dois campos.';return;}
-  localStorage.setItem('ct_sb_url',SB_URL);
-  localStorage.setItem('ct_sb_key',SB_KEY);
-  sbConfigured=true;
-  document.getElementById('sb-form').style.display='none';
-  document.getElementById('sb-banner').style.display='none';
-  document.getElementById('sb-status').textContent='';
-  refreshAll();
-}
-function clearSbConfig(){
-  localStorage.removeItem('ct_sb_url');localStorage.removeItem('ct_sb_key');
-  SB_URL='';SB_KEY='';sbConfigured=false;
-  document.getElementById('sb-url-in').value='';
-  document.getElementById('sb-key-in').value='';
-  document.getElementById('sb-status').textContent='Configuração removida. Usando dados demo.';
-}
-
-// ════════════════════════════════════
-// SUPABASE FETCH
-// ════════════════════════════════════
-async function sbFetch(path){
-  const res=await fetch(`${SB_URL}/rest/v1/${path}`,{
-    headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Accept':'application/json'}
-  });
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-// Mapeia linha da vw_dashboard para o formato UN usado pelo painel
-function mapDashboardRow(row, transp, canais, hh, int12){
-  return {
-    nome: row.nome,
-    cidade: row.cidade,
-    kpis:{
-      int_total: row.recebidos   || 0,
-      backlog:   row.total_backlog || 0,
-      int_00h:   row.recebidos   || 0,
-      exp_00h:   row.expedidos   || 0,
-    },
-    transp: transp.length ? transp.map(t=>({
-      n:t.transportadora, c:t.corte||'—',
-      total:t.total||0, exp:t.expedido||0, pend:t.pendente||0,
-      pct:t.pct_finalizado||0
-    })) : UN[row.codigo]?.transp || [],
-    canais: canais.length ? canais.map(c=>({
-      c:c.canal, total:c.total||0, fin:c.finalizado||0,
-      pend:c.pendente||0, pct:c.pct_finalizado||0, sub:[]
-    })) : UN[row.codigo]?.canais || [],
-    hh: hh.length ? hh.map(h=>({
-      h:`${String(h.hora).padStart(2,'0')}:00`,
-      b2b:h.b2b||0, b2c:h.b2c||0, tot:h.total||0
-    })) : UN[row.codigo]?.hh || [],
-    int12: int12.length ? int12.map(t=>({
-      n:t.transportadora, c:t.corte||'—',
-      total:t.total||0, exp:t.expedido||0, pend:t.pendente||0,
-      pct:t.pct_finalizado||0
-    })) : UN[row.codigo]?.int12 || [],
-  };
-}
-
-async function carregarDoSupabase(){
-  try {
-    setStatus('Buscando dados...');
-
-    // Buscar view principal + hora_hora em paralelo
-    const [dashboard, hhData] = await Promise.all([
-      sbFetch('vw_dashboard?select=*'),
-      sbFetch('hora_hora?select=*&data_ref=eq.'+today()+'&order=hora.asc').catch(()=>[]),
-    ]);
-
-    if(dashboard && dashboard.length){
-      const codigoMap = {'CD_SP':'SP','CD_RJ':'RJ','CD_PE':'PE','DS_BSB':'DARK','DS_POA':'DARK'};
-
-      dashboard.forEach(row=>{
-        const key = codigoMap[row.codigo];
-        if(!key || !UN[key]) return;
-
-        UN[key].nome   = row.nome   || UN[key].nome;
-        UN[key].cidade = row.cidade || UN[key].cidade;
-        if(row.recebidos   != null) UN[key].kpis.int_total = row.recebidos;
-        if(row.expedidos   != null) UN[key].kpis.exp_00h   = row.expedidos;
-        if(row.recebidos   != null) UN[key].kpis.int_00h   = row.recebidos;
-        if(row.total_backlog!= null) UN[key].kpis.backlog  = row.total_backlog;
-        if(row.sla_percentual    != null) UN[key].kpis.sla     = row.sla_percentual;
-        if(row.estoque_nivel     != null) UN[key].kpis.estoque = row.estoque_nivel;
-        if(row.ruptura_percentual!= null) UN[key].kpis.ruptura = row.ruptura_percentual;
-      });
-
-      if(hhData && hhData.length){
-        const codigoMapHH = {'CD_SP':'SP','CD_RJ':'RJ','CD_PE':'PE','DS_BSB':'DARK','DS_POA':'DARK'};
-        hhData.forEach(h=>{
-          const key=codigoMapHH[h.unidade_codigo];
-          if(!key||!UN[key]) return;
-          if(!UN[key]._hhLoaded){ UN[key].hh=[]; UN[key]._hhLoaded=true; }
-          UN[key].hh.push({
-            h:String(h.hora).padStart(2,'0')+':00',
-            b2b:h.b2b||0, b2c:h.b2c||0, tot:h.total||0
-          });
-        });
+      plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11,weight:'600'},color:'#64748b',padding:12}}},
+      scales:{
+        y:{ticks:{font:{size:10},color:'#94a3b8'},grid:{color:'rgba(0,0,0,.04)'}},
+        x:{ticks:{font:{size:10},color:'#64748b'},grid:{display:false}}
       }
-
-      setStatus('');
-    } else {
-      setStatus('Sem dados na view. Usando demo.');
     }
-  } catch(e){
-    setStatus('Erro: '+e.message);
-    console.warn('Supabase error:',e);
-  }
+  });
 }
 
-function today(){ return new Date().toISOString().split('T')[0]; }
-function setStatus(msg){
-  const el=document.getElementById('sb-status');
-  if(el) el.textContent=msg;
-  if(msg) document.getElementById('live-lbl').textContent=msg.startsWith('⚠')?'Erro':'Buscando…';
+// ════════ HEATMAP ════════
+function buildHeatmap(d){
+  const canais = ['B2B','B2C','Total'];
+  let html = `<div class="hm-grid">
+    <div class="hm-header">Transportadora</div>
+    ${canais.map(c=>`<div class="hm-header">${c}</div>`).join('')}
+    <div class="hm-header">Corte</div>
+    <div class="hm-header">% Fin.</div>
+  </div>
+  <div style="height:8px"></div>`;
+
+  d.transp.forEach(t=>{
+    const b2bPct = t.total>0?+(t.b2b/t.total*100).toFixed(0):0;
+    const b2cPct = t.total>0?+(t.b2c/t.total*100).toFixed(0):0;
+    const cells = [b2bPct, b2cPct, t.pct];
+    const hc = cells.map(p=>heatColor(p));
+    html += `<div class="hm-grid" style="margin-bottom:4px">
+      <div class="hm-label">${t.n}</div>
+      ${cells.map((p,i)=>`<div class="hm-cell" style="background:${hc[i].bg};color:${hc[i].color}" title="${p}%">${p}%</div>`).join('')}
+      <div class="hm-cell" style="background:#f8fafc;color:var(--muted)">${t.c}</div>
+      <div class="hm-cell">${pctBadge(t.pct)}</div>
+    </div>`;
+  });
+  document.getElementById('heatmap').innerHTML = html;
 }
 
-// ════════════════════════════════════
-// REFRESH
-// ════════════════════════════════════
-async function refreshAll(manual=false){
+// ════════ PROGRESS BARS ════════
+function buildProgress(d){
+  const maxTotal = Math.max(...d.transp.map(t=>t.total));
+  document.getElementById('prog-transp').innerHTML = d.transp.map(t=>{
+    const fillColor = t.pct>=80?'#059669':t.pct>=50?'#d97706':'#dc2626';
+    return `<div class="prog-item">
+      <div class="prog-head">
+        <span class="prog-name">${t.n} <span style="color:var(--muted);font-weight:500;font-size:10px">${t.c}</span></span>
+        <span class="prog-val" style="color:${fillColor}">${fp(t.pct,2)}</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div style="flex:1">
+          <div class="prog-track">
+            <div class="prog-fill" style="width:${t.pct}%;background:${fillColor}"></div>
+          </div>
+        </div>
+        <span style="font-size:10px;color:var(--muted);font-family:var(--mono);min-width:60px;text-align:right">${f(t.exp)} / ${f(t.total)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════ MAIN RENDER ════════
+function render(){
+  const d = UN[document.getElementById('sel-un').value];
+  document.getElementById('ph-sub').textContent = `${d.nome} · ${d.cidade}`;
+
+  // KPIs
+  const totFin = sum(d.transp,'exp');
+  const totTotal = sum(d.transp,'total');
+  const pctFin = totTotal>0?+(totFin/totTotal*100).toFixed(1):0;
+  const totB2B = sum(d.transp,'b2b');
+  const totB2C = sum(d.transp,'b2c');
+
+  document.getElementById('kpi-row').innerHTML=`
+    <div class="kpi kpi-blue anim d1">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+      <div class="kpi-lbl">Integração Total D-1</div>
+      <div class="kpi-val">${f(d.kpis.int_total)}</div>
+      <div class="kpi-delta delta-up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>pedidos integrados hoje</div>
+    </div>
+    <div class="kpi kpi-green anim d2">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="kpi-lbl">Expedição 00h</div>
+      <div class="kpi-val">${f(d.kpis.exp_00h)}</div>
+      <div class="kpi-delta delta-up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>${fp(pctFin,1)} do total expedido</div>
+    </div>
+    <div class="kpi kpi-amber anim d3">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+      <div class="kpi-lbl">B2B vs B2C</div>
+      <div class="kpi-val">${f(totB2B+totB2C)}</div>
+      <div class="kpi-delta delta-neu"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>B2B ${f(totB2B)} · B2C ${f(totB2C)}</div>
+    </div>
+    <div class="kpi kpi-red anim d4">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div class="kpi-lbl">Backlog Total</div>
+      <div class="kpi-val">${f(d.kpis.backlog)}</div>
+      <div class="kpi-delta ${d.kpis.backlog>0?'delta-dn':'delta-up'}"><svg viewBox="0 0 24 24"><polyline points="${d.kpis.backlog>0?'6 9 12 15 18 9':'18 15 12 9 6 15'}"/></svg>${d.kpis.backlog>0?'pedidos em atraso':'sem atrasos'}</div>
+    </div>`;
+
+  // Gauges
+  drawGauge('gauge-sla', d.sla, 'SLA %', '#2563eb', d.meta);
+  drawGauge('gauge-fin', pctFin, 'Finalizado', '#059669', d.meta);
+
+  // Canal table
+  const tC={total:sum(d.canais,'total'),fin:sum(d.canais,'fin')};
+  const tCp=tC.total?+(tC.fin/tC.total*100).toFixed(2):0;
+  document.querySelector('#tbl-canal tbody').innerHTML=
+    d.canais.map(r=>`
+      <tr><td class="bold">${r.c}</td><td class="r">${f(r.total)}</td><td class="r">${f(r.fin)}</td><td class="r">${pctBadge(r.pct)}</td></tr>
+      ${(r.sub||[]).map(s=>`<tr class="sub"><td>${s.l}</td><td class="r">${f(s.total)}</td><td class="r">${f(s.fin)}</td><td class="r">${pctBadge(s.pct)}</td></tr>`).join('')}
+    `).join('')+
+    `<tr class="total"><td>Total</td><td class="r">${f(tC.total)}</td><td class="r">${f(tC.fin)}</td><td class="r">${pctBadge(tCp)}</td></tr>`;
+
+  buildCharts(d);
+  buildHeatmap(d);
+  buildProgress(d);
+}
+
+function refresh(){
   const ic=document.getElementById('ref-icon');
   ic.classList.add('spinning');
-  if(sbConfigured) await carregarDoSupabase();
-  renderCarteira();renderBacklog();renderOtif();renderComplaints();renderEstoque();
-  ic.classList.remove('spinning');
-  const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('live-lbl').textContent=`${sbConfigured?'Supabase':'Demo'} · ${now}`;
+  setTimeout(()=>{
+    render();
+    ic.classList.remove('spinning');
+    document.getElementById('live-lbl').textContent='Atualizado';
+    setTimeout(()=>document.getElementById('live-lbl').textContent='Ao vivo',2000);
+  },600);
 }
 
-// INIT
-refreshAll();
-setInterval(()=>refreshAll(),30000);
-
-// ════════════════════════════════════
-// SLIDESHOW
-// ════════════════════════════════════
-const SLIDES = [
-  {
-    title:'Carteira de Pedidos',
-    sub:'Consolidado CD SP · transportadoras e canais',
-    render(el){
-      const d=UN['SP'];
-      // KPIs
-      const kRow=document.createElement('div');
-      kRow.className='kpi-row';kRow.style.marginBottom='16px';
-      kRow.innerHTML=`
-        <div class="kpi kpi-blue"><div class="kpi-lbl">Integração Total D-1</div><div class="kpi-val">${f(d.kpis.int_total)}</div><div class="kpi-sub">pedidos integrados</div></div>
-        <div class="kpi kpi-red"><div class="kpi-lbl">Backlog Total</div><div class="kpi-val">${f(d.kpis.backlog)}</div><div class="kpi-sub">pedidos em atraso</div></div>
-        <div class="kpi kpi-green"><div class="kpi-lbl">Integração 00h</div><div class="kpi-val">${f(d.kpis.int_00h)}</div><div class="kpi-sub">pedidos</div></div>
-        <div class="kpi kpi-amber"><div class="kpi-lbl">Expedição 00h</div><div class="kpi-val">${f(d.kpis.exp_00h)}</div><div class="kpi-sub">pedidos expedidos</div></div>`;
-      el.appendChild(kRow);
-      // Transp table
-      const tT={total:sum(d.transp,'total'),exp:sum(d.transp,'exp'),pend:sum(d.transp,'pend')};
-      const tTp=tT.total?+(tT.exp/tT.total*100).toFixed(2):0;
-      const tC={total:sum(d.canais,'total'),fin:sum(d.canais,'fin'),pend:sum(d.canais,'pend')};
-      const tCp=tC.total?+(tC.fin/tC.total*100).toFixed(2):0;
-      const g=document.createElement('div');g.className='g2';
-      g.innerHTML=`
-        <div class="card no-mb">
-          <div class="card-head"><div class="card-title">Por Transportadora</div></div>
-          <div class="tbl-wrap"><table>
-            <thead><tr><th>Transportadora</th><th>Corte</th><th class="r">Total</th><th class="r">Expedido</th><th class="r">Pendente</th><th class="r">% Finalizado</th></tr></thead>
-            <tbody>
-              ${d.transp.map(r=>`<tr><td class="bold">${r.n}</td><td style="color:rgba(255,255,255,.4)">${r.c}</td><td class="r">${f(r.total)}</td><td class="r">${f(r.exp)}</td><td class="r">${f(r.pend)}</td><td class="r">${pb(r.pct)}</td></tr>`).join('')}
-              <tr class="total"><td colspan="2">Total</td><td class="r">${f(tT.total)}</td><td class="r">${f(tT.exp)}</td><td class="r">${f(tT.pend)}</td><td class="r">${pb(tTp)}</td></tr>
-            </tbody>
-          </table></div>
-        </div>
-        <div class="card no-mb">
-          <div class="card-head"><div class="card-title">Por Canal</div></div>
-          <div class="tbl-wrap"><table>
-            <thead><tr><th>Canal</th><th class="r">Total</th><th class="r">Finalizado</th><th class="r">Pendente</th><th class="r">% Finalizado</th></tr></thead>
-            <tbody>
-              ${d.canais.map(r=>`
-                <tr><td class="bold">${r.c}</td><td class="r bold">${f(r.total)}</td><td class="r bold">${f(r.fin)}</td><td class="r bold">${f(r.pend)}</td><td class="r">${pb(r.pct)}</td></tr>
-                ${r.sub.map(s=>`<tr class="sub"><td>${s.l}</td><td class="r">${f(s.total)}</td><td class="r">${f(s.fin)}</td><td class="r">${f(s.pend)}</td><td class="r">${pb(s.pct)}</td></tr>`).join('')}
-              `).join('')}
-              <tr class="total"><td>Total</td><td class="r">${f(tC.total)}</td><td class="r">${f(tC.fin)}</td><td class="r">${f(tC.pend)}</td><td class="r">${pb(tCp)}</td></tr>
-            </tbody>
-          </table></div>
-        </div>`;
-      el.appendChild(g);
-      // Chart transp
-      const cc=document.createElement('div');cc.className='card no-mb';
-      cc.innerHTML=`<div class="card-head"><div class="card-title">% Finalizado por Transportadora</div></div><div class="chart-box" style="height:200px"><canvas id="sl-ch-tr" role="img" aria-label="finalizado por transportadora no slideshow"></canvas></div>`;
-      el.appendChild(cc);
-      setTimeout(()=>{
-        const ctx=document.getElementById('sl-ch-tr');
-        if(!ctx) return;
-        new Chart(ctx.getContext('2d'),{type:'bar',
-          data:{labels:d.transp.map(r=>`${r.n} (${r.c})`),
-            datasets:[
-              {label:'% Finalizado',data:d.transp.map(r=>r.pct),backgroundColor:d.transp.map(r=>r.pct>=80?'#4ade80':r.pct>=50?'#fbbf24':'#f87171'),borderRadius:5,borderSkipped:false},
-              {label:'Meta 70%',data:d.transp.map(()=>70),type:'line',borderColor:'#60a5fa',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false},
-            ]},
-          options:{responsive:true,maintainAspectRatio:false,
-            plugins:{legend:{display:false}},
-            scales:{y:{min:0,max:105,ticks:{color:'rgba(255,255,255,.4)',callback:v=>v+'%',font:{size:10}},grid:{color:'rgba(255,255,255,.06)'}},
-                    x:{ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{display:false}}}}});
-      },100);
-    }
-  },
-  {
-    title:'Hora × Hora — Expedição',
-    sub:'CD SP · B2B e B2C acumulado no dia',
-    render(el){
-      const d=UN['SP'];
-      const tHH={b2b:sum(d.hh,'b2b'),b2c:sum(d.hh,'b2c'),tot:sum(d.hh,'tot')};
-      const tI={total:sum(d.int12,'total'),exp:sum(d.int12,'exp'),pend:sum(d.int12,'pend')};
-      const tIp=tI.total?+(tI.exp/tI.total*100).toFixed(2):0;
-      const g=document.createElement('div');g.className='g2';g.style.marginBottom='14px';
-      g.innerHTML=`
-        <div class="card no-mb">
-          <div class="card-head"><div class="card-title">Hora × Hora</div></div>
-          <div class="tbl-wrap"><table>
-            <thead><tr><th>Hora</th><th class="r">B2B</th><th class="r">B2C</th><th class="r">Total</th></tr></thead>
-            <tbody>
-              ${d.hh.map(r=>`<tr><td>${r.h}</td><td class="r">${r.b2b||'—'}</td><td class="r">${f(r.b2c)}</td><td class="r bold">${f(r.tot)}</td></tr>`).join('')}
-              <tr class="total"><td>Total</td><td class="r">${f(tHH.b2b)}</td><td class="r">${f(tHH.b2c)}</td><td class="r">${f(tHH.tot)}</td></tr>
-            </tbody>
-          </table></div>
-        </div>
-        <div class="card no-mb">
-          <div class="card-head"><div class="card-title">Integração até 12h</div></div>
-          <div class="tbl-wrap"><table>
-            <thead><tr><th>Transportadora</th><th>Corte</th><th class="r">Total</th><th class="r">Expedido</th><th class="r">Pendente</th><th class="r">% Finalizado</th></tr></thead>
-            <tbody>
-              ${d.int12.map(r=>`<tr><td class="bold">${r.n}</td><td style="color:rgba(255,255,255,.4)">${r.c}</td><td class="r">${f(r.total)}</td><td class="r">${f(r.exp)}</td><td class="r">${f(r.pend)}</td><td class="r">${pb(r.pct)}</td></tr>`).join('')}
-              <tr class="total"><td colspan="2">Total</td><td class="r">${f(tI.total)}</td><td class="r">${f(tI.exp)}</td><td class="r">${f(tI.pend)}</td><td class="r">${pb(tIp)}</td></tr>
-            </tbody>
-          </table></div>
-        </div>`;
-      el.appendChild(g);
-      // HH chart
-      const cc=document.createElement('div');cc.className='card no-mb';
-      cc.innerHTML=`<div class="card-head"><div class="card-title">Evolução da Expedição</div></div><div class="chart-box" style="height:220px"><canvas id="sl-ch-hh" role="img" aria-label="expedição hora a hora no slideshow"></canvas></div>`;
-      el.appendChild(cc);
-      setTimeout(()=>{
-        const ctx=document.getElementById('sl-ch-hh');if(!ctx)return;
-        const hh=d.hh.filter(r=>r.tot>0);
-        new Chart(ctx.getContext('2d'),{type:'bar',
-          data:{labels:hh.map(r=>r.h),
-            datasets:[
-              {label:'B2C',data:hh.map(r=>r.b2c),backgroundColor:'#3b82f6',borderRadius:4,stack:'s'},
-              {label:'B2B',data:hh.map(r=>r.b2b),backgroundColor:'#1A56DB',borderRadius:4,stack:'s'},
-            ]},
-          options:{responsive:true,maintainAspectRatio:false,
-            plugins:{legend:{display:true,position:'top',labels:{color:'rgba(255,255,255,.6)',boxWidth:10,font:{size:11}}}},
-            scales:{y:{stacked:true,ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{color:'rgba(255,255,255,.06)'}},
-                    x:{stacked:true,ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{display:false}}}}});
-      },100);
-    }
-  },
-  {
-    title:'Backlog',
-    sub:'B2B e B2C — CD SP · semana atual',
-    render(el){
-      ['b2b','b2c'].forEach((tipo,idx)=>{
-        const rows=BL[tipo];
-        const tot={p:sum(rows,'p'),i:sum(rows,'i'),bl:sum(rows,'bl')};
-        const c=document.createElement('div');c.className='card';c.style.marginBottom='14px';
-        c.innerHTML=`
-          <div class="card-head"><div class="card-title">Backlog ${tipo.toUpperCase()} — CD SP</div></div>
-          <div class="tbl-wrap"><table>
-            <thead><tr><th>Data</th><th class="r">Planejado</th><th class="r">Integ. Corte</th><th class="r">% Variação</th><th class="r">Backlog</th><th class="r">% Backlog</th><th class="r">Integ. 00h</th><th class="r">Exped. 00h</th></tr></thead>
-            <tbody>
-              ${rows.map(r=>`<tr>
-                <td>${r.d}</td><td class="r">${f(r.p)}</td><td class="r">${r.i||'—'}</td>
-                <td class="r ${r.v<0?'neg':'pos'}">${fp(r.v,2)}</td>
-                <td class="r ${r.bl>0?'bl':''}">${r.bl||'0'}</td>
-                <td class="r">${r.pb!=null?fp(r.pb,2):'—'}</td>
-                <td class="r">${r.i0||'—'}</td><td class="r">${r.e0||'—'}</td>
-              </tr>`).join('')}
-              <tr class="total"><td>Total</td><td class="r">${f(tot.p)}</td><td class="r">${f(tot.i)}</td><td class="r">—</td><td class="r bl">${f(tot.bl)}</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
-            </tbody>
-          </table></div>`;
-        el.appendChild(c);
-      });
-    }
-  },
-  {
-    title:'Backlog Histórico',
-    sub:'SP · RJ · PE · Dark Store — 2024 / 2025 / 2026 vs target 0,80%',
-    render(el){
-      const grid=document.createElement('div');grid.className='g2';
-      [{id:'sl-bl-sp',t:'Backlog — SP',k:'SP'},{id:'sl-bl-rj',t:'Backlog — RJ',k:'RJ'},
-       {id:'sl-bl-pe',t:'Backlog — PE',k:'PE'},{id:'sl-bl-dk',t:'Backlog — Dark Store',k:'DARK'}]
-      .forEach(c=>{
-        const d=document.createElement('div');d.className='card no-mb';d.id=c.id;grid.appendChild(d);
-      });
-      el.appendChild(grid);
-      setTimeout(()=>{
-        [{id:'sl-bl-sp',t:'Backlog — SP',k:'SP'},{id:'sl-bl-rj',t:'Backlog — RJ',k:'RJ'},
-         {id:'sl-bl-pe',t:'Backlog — PE',k:'PE'},{id:'sl-bl-dk',t:'Backlog — Dark',k:'DARK'}]
-        .forEach(c=>histChart(c.id,c.t,BL.hist[c.k],true));
-      },50);
-    }
-  },
-  {
-    title:'BTQ OTIF',
-    sub:'On Time In Full — target 97% · SP / RJ / PE',
-    render(el){
-      // Badge
-      const bw=document.createElement('div');bw.style.cssText='display:flex;gap:8px;margin-bottom:16px';
-      bw.innerHTML=`<span class="tgt tgt-gray">TARGET: 97%</span><span class="tgt tgt-warn">REALIZADO: 93,98%</span>`;
-      el.appendChild(bw);
-      const grid=document.createElement('div');grid.className='g3';
-      [{id:'sl-ot-sp',t:'OTIF — SP',k:'SP'},{id:'sl-ot-rj',t:'OTIF — RJ',k:'RJ'},{id:'sl-ot-pe',t:'OTIF — PE',k:'PE'}]
-      .forEach(c=>{const d=document.createElement('div');d.className='card no-mb';d.id=c.id;grid.appendChild(d);});
-      el.appendChild(grid);
-      setTimeout(()=>{
-        [{id:'sl-ot-sp',t:'OTIF — SP',k:'SP'},{id:'sl-ot-rj',t:'OTIF — RJ',k:'RJ'},{id:'sl-ot-pe',t:'OTIF — PE',k:'PE'}]
-        .forEach(c=>histChart(c.id,c.t,OTIF[c.k],false));
-      },50);
-    }
-  },
-  {
-    title:'Complaints Logística',
-    sub:'403 = Inversão · 404 = Falta — target 0,14% · todas as unidades',
-    render(el){
-      const bw=document.createElement('div');bw.style.cssText='display:flex;gap:8px;margin-bottom:16px';
-      bw.innerHTML=`<span class="tgt tgt-gray">TARGET: 0,14%</span><span class="tgt tgt-bad">REALIZADO: 0,144%</span>`;
-      el.appendChild(bw);
-      const g1=document.createElement('div');g1.className='g2';g1.style.marginBottom='14px';
-      const g2=document.createElement('div');g2.className='g2';
-      [{id:'sl-co-sp',t:'Complaints — SP',k:'SP',g:g1},{id:'sl-co-rj',t:'Complaints — RJ',k:'RJ',g:g1},
-       {id:'sl-co-pe',t:'Complaints — PE',k:'PE',g:g2},{id:'sl-co-dk',t:'Complaints — Dark',k:'DARK',g:g2}]
-      .forEach(c=>{const d=document.createElement('div');d.className='card no-mb';d.id=c.id;c.g.appendChild(d);});
-      el.appendChild(g1);el.appendChild(g2);
-      setTimeout(()=>{
-        [{id:'sl-co-sp',t:'Complaints — SP',k:'SP'},{id:'sl-co-rj',t:'Complaints — RJ',k:'RJ'},
-         {id:'sl-co-pe',t:'Complaints — PE',k:'PE'},{id:'sl-co-dk',t:'Complaints — Dark',k:'DARK'}]
-        .forEach(c=>histChart(c.id,c.t,COMP[c.k],true));
-      },50);
-    }
-  },
-  {
-    title:'Estoque',
-    sub:`Valor total R$ ${(EST.total/1e6).toFixed(2).replace('.',',')}M · por armazém e tipo de produto`,
-    render(el){
-      // Chart armazéns
-      const cc=document.createElement('div');cc.className='card';
-      cc.innerHTML=`<div class="card-head"><div><div class="card-title">Valor Total por Armazém</div><div class="card-sub">Total R$ ${fr(EST.total)}</div></div></div><div class="chart-box" style="height:200px"><canvas id="sl-est-arm" role="img" aria-label="valor por armazém no slideshow"></canvas></div>`;
-      el.appendChild(cc);
-      // Cards produtos
-      const cp=document.createElement('div');cp.className='card no-mb';
-      cp.innerHTML=`<div class="card-head"><div class="card-title">Por Tipo de Produto</div></div>
-        <div class="est-grid">${EST.prod.map(p=>`
-          <div class="est-card">
-            <div class="est-card-name"><div class="est-dot"></div>${p.n}</div>
-            <div class="est-val">${fr(p.v)}</div>
-            <div class="est-meta">
-              <span class="est-itens">${f(p.it)} itens</span>
-              <span class="est-share">Share: ${p.sh}%</span>
-              ${p.d!=null?`<span class="est-delta ${p.d>0?'delta-up':'delta-flat'}">+${p.d}%</span>`:`<span style="font-size:10px;color:rgba(255,255,255,.3)">Sem histórico</span>`}
-            </div>
-            <div class="est-bar-wrap"><div class="est-bar" style="width:${p.sh}%"></div></div>
-          </div>`).join('')}
-        </div>`;
-      el.appendChild(cp);
-      setTimeout(()=>{
-        const ctx=document.getElementById('sl-est-arm');if(!ctx)return;
-        new Chart(ctx.getContext('2d'),{type:'bar',
-          data:{labels:EST.arm.map(a=>a.cod),
-            datasets:[{label:'Valor',data:EST.arm.map(a=>a.v),backgroundColor:'#b8973a',borderRadius:5,borderSkipped:false}]},
-          options:{responsive:true,maintainAspectRatio:false,
-            plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' R$ '+(+c.raw).toLocaleString('pt-BR',{minimumFractionDigits:0})}}},
-            scales:{y:{ticks:{color:'rgba(255,255,255,.4)',callback:v=>'R$ '+(v/1000).toFixed(0)+'k',font:{size:10}},grid:{color:'rgba(255,255,255,.06)'}},
-                    x:{ticks:{color:'rgba(255,255,255,.4)',font:{size:11,weight:'600'}},grid:{display:false}}}}});
-      },100);
-    }
-  }
-];
-
-let slideIdx=0, slideTimer=null, slidePaused=false, slideInterval=8000;
-
-function buildDots(){
-  const d=document.getElementById('slide-dots');
-  d.innerHTML=SLIDES.map((_,i)=>`<button class="slide-dot ${i===slideIdx?'active':''}" onclick="goSlide(${i})"></button>`).join('');
-}
-
-function updateTimerRing(elapsed){
-  const pct=elapsed/slideInterval;
-  const circ=81.7;
-  document.getElementById('slide-timer-ring').style.strokeDashoffset=pct*circ;
-  document.getElementById('slide-timer-num').textContent=Math.ceil((slideInterval-elapsed)/1000);
-}
-
-function goSlide(i){
-  slideIdx=((i%SLIDES.length)+SLIDES.length)%SLIDES.length;
-  const s=SLIDES[slideIdx];
-  document.getElementById('slide-title').textContent=s.title;
-  document.getElementById('slide-subtitle').textContent=s.sub;
-  const content=document.getElementById('slide-content');
-  content.innerHTML='';
-  s.render(content);
-  buildDots();
-  resetTimer();
-}
-
-function resetTimer(){
-  if(slideTimer) clearInterval(slideTimer);
-  if(slidePaused) return;
-  let elapsed=0;
-  updateTimerRing(0);
-  slideTimer=setInterval(()=>{
-    elapsed+=100;
-    updateTimerRing(elapsed);
-    if(elapsed>=slideInterval){slideNext();}
-  },100);
-}
-
-function startSlideshow(){
-  slideIdx=0;
-  slidePaused=false;
-  document.getElementById('slide-overlay').classList.add('active');
-  document.body.style.overflow='hidden';
-  document.getElementById('pause-icon').innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-  goSlide(0);
-  document.addEventListener('keydown',slideKeyHandler);
-}
-
-function stopSlideshow(){
-  if(slideTimer) clearInterval(slideTimer);
-  document.getElementById('slide-overlay').classList.remove('active');
-  document.body.style.overflow='';
-  document.removeEventListener('keydown',slideKeyHandler);
-}
-
-function slidePause(){
-  slidePaused=!slidePaused;
-  const icon=document.getElementById('pause-icon');
-  if(slidePaused){
-    clearInterval(slideTimer);
-    icon.innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';
-  } else {
-    icon.innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-    resetTimer();
-  }
-}
-
-function slideNext(){goSlide(slideIdx+1);}
-function slidePrev(){goSlide(slideIdx-1);}
-
-function slideKeyHandler(e){
-  if(e.key==='Escape') stopSlideshow();
-  else if(e.key==='ArrowRight'||e.key===' ') slideNext();
-  else if(e.key==='ArrowLeft') slidePrev();
-}
+render();
+setInterval(refresh, 30000);
 </script>
 </body>
 </html>
