@@ -216,6 +216,90 @@ tr.sub td:first-child{padding-left:28px}
 .df-btn:hover{border-color:var(--border-md);color:var(--text)}
 .df-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
 
+/* ══ TV MODE ══ */
+.tv-btn{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-family:var(--font);font-size:12px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s}
+.tv-btn:hover{background:#f1f5f9}
+.tv-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+#tv-screen{display:none;position:fixed;inset:0;background:#0a0a0a;z-index:2000;flex-direction:column;overflow:hidden}
+#tv-screen.active{display:flex}
+.tv-header{display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:#111;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.tv-logo-wrap{display:flex;align-items:center;gap:14px}
+.tv-title{font-size:13px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.02em}
+.tv-time{font-size:28px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;font-family:var(--mono);letter-spacing:-.5px}
+.tv-date{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;font-weight:500}
+.tv-live{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#4ade80;background:rgba(74,222,128,.1);padding:5px 12px;border-radius:20px}
+.tv-live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+.tv-exit{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.5);font-size:11px;font-family:var(--font);cursor:pointer;font-weight:600;transition:all .15s}
+.tv-exit:hover{background:rgba(255,255,255,.08);color:#fff}
+/* TV SLIDE INDICATOR */
+.tv-slides-bar{display:flex;gap:4px;align-items:center}
+.tv-slide-dot{height:3px;border-radius:99px;background:rgba(255,255,255,.2);transition:all .4s ease;cursor:pointer}
+.tv-slide-dot.active{background:#fff;width:24px!important}
+/* TV CONTENT AREA */
+.tv-body{flex:1;overflow:hidden;position:relative}
+.tv-slide{position:absolute;inset:0;padding:20px 32px;opacity:0;transform:translateX(40px);transition:all .5s cubic-bezier(.4,0,.2,1);pointer-events:none;overflow:hidden}
+.tv-slide.active{opacity:1;transform:translateX(0);pointer-events:auto}
+.tv-slide.exit{opacity:0;transform:translateX(-40px)}
+/* TV KPI STRIP */
+.tv-kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.tv-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+.tv-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0}
+.tv-kpi-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.tv-kpi-val{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
+.tv-kpi-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:5px;font-weight:500}
+.tv-kpi.alert-tv{border-color:rgba(220,38,38,.4);animation:tvKpiPulse 2s infinite}
+@keyframes tvKpiPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.2)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+/* TV GRID */
+.tv-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.tv-g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.tv-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.tv-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+.tv-card-head{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.tv-card-title{font-size:12px;font-weight:700;color:rgba(255,255,255,.8)}
+.tv-card-sub{font-size:10px;color:rgba(255,255,255,.35);font-weight:500}
+/* TV TABLE */
+.tv-tbl-wrap{overflow:hidden}
+.tv-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tv-tbl thead th{padding:8px 14px;text-align:left;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid rgba(255,255,255,.06);background:transparent}
+.tv-tbl th.r,.tv-tbl td.r{text-align:right;font-family:var(--mono);font-size:11px}
+.tv-tbl tbody td{padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.8)}
+.tv-tbl tbody tr:last-child td{border-bottom:none}
+.tv-tbl tr.tv-total td{background:rgba(255,255,255,.06);font-weight:700;border-top:1px solid rgba(255,255,255,.08)}
+/* TV GAUGE */
+.tv-gauge-row{display:grid;grid-template-columns:1fr 1fr;height:100%;overflow:hidden}
+.tv-gauge-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;border-right:1px solid rgba(255,255,255,.06);overflow:hidden}
+.tv-gauge-cell:last-child{border-right:none}
+/* TV PROGRESS */
+.tv-prog{padding:12px 16px}
+.tv-prog-item{margin-bottom:10px}
+.tv-prog-item:last-child{margin-bottom:0}
+.tv-prog-head{display:flex;justify-content:space-between;margin-bottom:4px}
+.tv-prog-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.7)}
+.tv-prog-val{font-size:11px;font-weight:700;font-family:var(--mono)}
+.tv-prog-track{height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.tv-prog-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+/* TV HEATMAP */
+.tv-hm{padding:12px 16px}
+.tv-hm-row{display:grid;gap:4px;margin-bottom:4px;align-items:center}
+.tv-hm-cell{height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono)}
+.tv-hm-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.6)}
+.tv-hm-hdr{font-size:9px;font-weight:700;color:rgba(255,255,255,.3);text-align:center;text-transform:uppercase;letter-spacing:.05em}
+/* TV RANKING */
+.tv-rank-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.tv-rank-item:last-child{border-bottom:none}
+.tv-rank-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.tv-rank-name{flex:1;font-size:13px;font-weight:700;color:rgba(255,255,255,.85)}
+.tv-rank-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+.tv-rank-score{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.tv-rank-bar-wrap{width:100px;height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-top:5px}
+.tv-rank-bar{height:100%;border-radius:99px;transition:width .8s ease}
+/* TV PROGRESS BAR BOTTOM */
+.tv-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 32px;background:#111;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.tv-progress-track{flex:1;height:3px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;margin:0 20px}
+.tv-progress-fill{height:100%;background:#fff;border-radius:99px;transition:width .1s linear}
+.tv-slide-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.4)}
+.tv-next-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.25)}
+
 /* ══ ESTOQUE ══ */
 .est-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:var(--border)}
 .est-card{background:var(--surface);padding:14px 16px}
@@ -273,7 +357,7 @@ tr.sub td:first-child{padding-left:28px}
   <div class="topbar-right">
     <div class="live-pill"><div class="live-dot"></div><span id="live-lbl">Ao vivo</span></div>
     <button class="btn-sm" onclick="refreshAll()"><svg id="ref-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Atualizar</button>
-    <button class="btn-sm btn-primary" onclick="startSlide()"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Apresentação</button>
+    <button class="btn-sm btn-primary" onclick="startTV()" title="Modo TV — tela cheia para operação"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Modo TV</button>
     <button class="btn-sm" onclick="doLogout()" title="Sair"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
   </div>
 </nav>
@@ -291,7 +375,8 @@ tr.sub td:first-child{padding-left:28px}
       <label>Unidade</label>
       <select id="sel-un" onchange="renderCarteira()">
         <option value="SP">CD SP</option><option value="RJ">CD RJ</option>
-        <option value="PE">CD PE</option><option value="DARK">Dark Store</option>
+        <option value="PE">CD PE</option><option value="BSB">Dark Store BSB</option>
+        <option value="POA">Dark Store POA</option>
       </select>
     </div>
   </div>
@@ -332,9 +417,7 @@ tr.sub td:first-child{padding-left:28px}
         <tbody></tbody>
       </table></div>
     </div>
-  </div>
-</div>
-
+  </div></div>
 <!-- ══ PAGE: BACKLOG ══ -->
 <div id="page-backlog" class="page">
   <div class="ph">
@@ -351,17 +434,14 @@ tr.sub td:first-child{padding-left:28px}
   </div>
   <div class="g2"><div class="card" id="ch-bl-sp"></div><div class="card" id="ch-bl-rj"></div></div>
   <div class="g2" style="margin-top:14px"><div class="card" id="ch-bl-pe"></div><div class="card" id="ch-bl-dark"></div></div>
-</div>
-
+  <div class="g2" style="margin-top:14px"><div class="card" id="ch-bl-poa"></div><div class="card"></div></div></div>
 <!-- ══ PAGE: OTIF ══ -->
 <div id="page-otif" class="page">
   <div class="ph">
     <div><h1>BTQ OTIF</h1><p>On Time, In Full — pedidos sem divergência e no prazo.</p></div>
     <div class="tgt-wrap"><span class="tgt tgt-gray">TARGET: 97%</span><span class="tgt" id="otif-badge">REALIZADO: 93,98%</span></div>
   </div>
-  <div class="g3"><div class="card" id="ch-ot-sp"></div><div class="card" id="ch-ot-rj"></div><div class="card" id="ch-ot-pe"></div></div>
-</div>
-
+  <div class="g3"><div class="card" id="ch-ot-sp"></div><div class="card" id="ch-ot-rj"></div><div class="card" id="ch-ot-pe"></div></div></div>
 <!-- ══ PAGE: COMPLAINTS ══ -->
 <div id="page-complaints" class="page">
   <div class="ph">
@@ -370,18 +450,46 @@ tr.sub td:first-child{padding-left:28px}
   </div>
   <div class="g2"><div class="card" id="ch-co-sp"></div><div class="card" id="ch-co-rj"></div></div>
   <div class="g2" style="margin-top:14px"><div class="card" id="ch-co-pe"></div><div class="card" id="ch-co-dark"></div></div>
-</div>
-
+  <div class="g2" style="margin-top:14px"><div class="card" id="ch-co-poa"></div><div class="card"></div></div></div>
 <!-- ══ PAGE: ESTOQUE ══ -->
 <div id="page-estoque" class="page">
-  <div class="ph"><div><h1>Estoque</h1><p>Valor consolidado por armazém e produto.</p></div></div>
-  <div class="card" style="margin-bottom:14px">
-    <div class="card-head"><div><div class="card-title">Valor Total por Armazém</div><div class="card-sub" id="est-sub"></div></div></div>
-    <div class="chart-box" style="height:200px"><canvas id="ch-est"></canvas></div>
+  <div class="ph">
+    <div><h1>Estoque</h1><p>Indicadores consolidados · todas as unidades</p></div>
+    <div class="ph-right">
+      <label>Unidade</label>
+      <select id="sel-est-un" onchange="renderEstoque()">
+        <option value="all">Todas</option>
+        <option value="SP">CD SP</option>
+        <option value="RJ">CD RJ</option>
+        <option value="PE">CD PE</option>
+        <option value="BSB">Dark BSB</option>
+        <option value="POA">Dark POA</option>
+      </select>
+    </div>
   </div>
-  <div class="card"><div class="card-head"><div class="card-title">Por Tipo de Produto</div></div><div class="est-grid" id="est-cards"></div></div>
-</div>
-
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px" id="kpis-est"></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px" id="kpis-est2"></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">💰 Valor Total por Armazém</div><div class="card-sub" id="est-sub"></div></div></div>
+      <div class="chart-box" style="height:200px"><canvas id="ch-est"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">🔄 Giro vs Fill Rate</div><div class="card-sub">Eficiência por unidade</div></div></div>
+      <div class="chart-box" style="height:200px"><canvas id="ch-est-giro"></canvas></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-head"><div class="card-title">📦 Por Tipo de Produto</div></div><div class="est-grid" id="est-cards"></div></div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">🔴 Top 10 SKUs Críticos</div><div class="card-sub">Estoque abaixo do mínimo</div></div>
+        <span class="badge badge-bad" id="est-rupt-badge">48 rupturas</span>
+      </div>
+      <div class="tbl-wrap"><table id="tbl-top10">
+        <thead><tr><th>SKU</th><th>Produto</th><th class="r">Estoque</th><th class="r">Mínimo</th><th class="r">Cobertura</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
 <!-- ══ PAGE: RANKING ══ -->
 <div id="page-ranking" class="page">
   <div class="ph"><div><h1>🏆 Ranking de Performance</h1><p>Classificação das unidades por indicadores do dia.</p></div>
@@ -403,6 +511,33 @@ tr.sub td:first-child{padding-left:28px}
       <div class="card-head"><div><div class="card-title">Comparativo Visual</div></div></div>
       <div class="chart-box" style="height:280px"><canvas id="ch-rank"></canvas></div>
     </div>
+  </div>
+</div>
+
+<!-- ══ TV MODE ══ -->
+<div id="tv-screen">
+  <div class="tv-header">
+    <div class="tv-logo-wrap">
+      <div id="tv-logo-img"></div>
+      <div style="border-left:1px solid rgba(255,255,255,.1);padding-left:14px">
+        <div class="tv-title">Control Tower · Operações Logísticas</div>
+        <div class="tv-slides-bar" id="tv-dots" style="margin-top:6px"></div>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div class="tv-time" id="tv-clock">00:00:00</div>
+      <div class="tv-date" id="tv-date"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="tv-live"><div class="tv-live-dot"></div>Ao vivo</div>
+      <button class="tv-exit" onclick="stopTV()">✕ Sair</button>
+    </div>
+  </div>
+  <div class="tv-body" id="tv-body"></div>
+  <div class="tv-footer">
+    <div class="tv-slide-name" id="tv-current-name">—</div>
+    <div class="tv-progress-track"><div class="tv-progress-fill" id="tv-prog-fill" style="width:0%"></div></div>
+    <div class="tv-next-name" id="tv-next-name">próximo: —</div>
   </div>
 </div>
 
@@ -493,11 +628,17 @@ const UN = {
     canais:[{c:'B2C',total:507,fin:278,pct:54.83,sub:[]},{c:'B2B',total:21,fin:21,pct:100,sub:[]}],
     hh:[{h:'15h',b2b:21,b2c:278,tot:299}],
   },
-  DARK:{nome:'Dark Store',cidade:'BSB + POA',sla:67.31,meta:85,
-    kpis:{int_total:468,backlog:0,exp_00h:315,int_00h:315},
-    transp:[{n:'Dialogo',c:'04/05',total:315,exp:315,b2b:0,b2c:315,pct:100},{n:'Dialogo',c:'05/05',total:153,exp:0,b2b:0,b2c:0,pct:0}],
-    canais:[{c:'B2C',total:468,fin:315,pct:67.31,sub:[]}],
-    hh:[{h:'15h',b2b:0,b2c:315,tot:315}],
+  BSB:{nome:'Dark Store BSB',cidade:'Brasília',sla:63.40,meta:85,
+    kpis:{int_total:283,backlog:0,exp_00h:195,int_00h:283},
+    transp:[{n:'Dialogo',c:'04/05',total:185,exp:185,b2b:0,b2c:185,pct:100},{n:'Dialogo',c:'05/05',total:98,exp:0,b2b:0,b2c:0,pct:0}],
+    canais:[{c:'B2C',total:283,fin:195,pct:68.90,sub:[{l:'04/05',total:185,fin:185,pct:100},{l:'05/05',total:98,fin:10,pct:10.20}]}],
+    hh:[{h:'13h',b2b:0,b2c:42,tot:42},{h:'14h',b2b:0,b2c:78,tot:78},{h:'15h',b2b:0,b2c:75,tot:75}],
+  },
+  POA:{nome:'Dark Store POA',cidade:'Porto Alegre',sla:71.20,meta:85,
+    kpis:{int_total:185,backlog:0,exp_00h:120,int_00h:185},
+    transp:[{n:'Dialogo',c:'04/05',total:130,exp:130,b2b:0,b2c:130,pct:100},{n:'Dialogo',c:'05/05',total:55,exp:0,b2b:0,b2c:0,pct:0}],
+    canais:[{c:'B2C',total:185,fin:120,pct:64.86,sub:[{l:'04/05',total:130,fin:130,pct:100},{l:'05/05',total:55,fin:0,pct:0}]}],
+    hh:[{h:'13h',b2b:0,b2c:38,tot:38},{h:'14h',b2b:0,b2c:52,tot:52},{h:'15h',b2b:0,b2c:30,tot:30}],
   }
 };
 const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -508,7 +649,8 @@ const BL={
     SP:{y24:[0.04,0.78,3.40,0.04,6.60,5.29,5.90,1.87,0.17,0.13,1.33,10.66],y25:[17.9,22.9,16.1,6.3,1.8,1.8,1.8,3.3,1.7,1.5,1.0,0.63],y26:[0.12,0.37,0.13],t:0.80},
     RJ:{y24:[1.3,0,0,0,0,0,6.2,0,0.2,1.1,0.3,0],y25:[74.6,61.7,12.0,1.8,10.9,0,0,0,0,0,0,0],y26:[0,0,0],t:0.80},
     PE:{y24:[3.69,0,0,0.89,0.02,0,0,0,0,0,0.1,0],y25:[0,0,0,0,0,0,0,0,0,0,0,0],y26:[0,0,0],t:0.80},
-    DARK:{y24:Array(12).fill(null),y25:[0.27,0.27,0.46,0.08,0,0,0,0,0,2.64,31.30,0],y26:[0,0,0],t:0.80},
+    BSB:{y24:Array(12).fill(null),y25:[0.27,0.27,0.46,0.08,0,0,0,0,0,2.64,31.30,0],y26:[0,0,0],t:0.80},
+    POA:{y24:Array(12).fill(null),y25:[0.30,0.25,0.40,0.10,0,0,0,0,0,1.80,28.50,0],y26:[0,0,0],t:0.80},
   }
 };
 const OTIF={
@@ -520,12 +662,36 @@ const COMP={
   SP:{y24:[0.13,0.13,0.17,0.16,0.24,0.25,0.19,0.12,0.14,0.12,0.12,0.13],y25:[1.16,1.48,0.69,1.17,0.92,0.33,0.28,0.48,0.30,0.30,0.39,0.30],y26:[0.23,0.138,0.139],t:0.14},
   RJ:{y24:[0.04,0.05,0.09,0.04,0.04,0.07,0.11,0.13,0.05,0,0.02,0.05],y25:[0.04,0.13,0.04,0.02,0.05,0.04,0.01,0.01,0.02,0.05,0.02,0.02],y26:[0.11,0.18,0.10],t:0.14},
   PE:{y24:[0,0,0,0,0.05,0.06,0.02,0.07,0.02,0.03,0.10,0.10],y25:[0.08,0,0,0,0,0,0,0,0.20,0.19,0.10,0.12],y26:[0.10,0,0.03],t:0.14},
-  DARK:{y24:Array(12).fill(null),y25:[0.48,0.47,0.39,0.19,0.28,0.46,0.40,0.45,0.46,0.38,0.55,0.92],y26:[0.87,0.54,0.50],t:0.14},
+  BSB:{y24:Array(12).fill(null),y25:[0.48,0.47,0.39,0.19,0.28,0.46,0.40,0.45,0.46,0.38,0.55,0.92],y26:[0.87,0.54,0.50],t:0.14},
+  POA:{y24:Array(12).fill(null),y25:[0.42,0.38,0.35,0.15,0.22,0.40,0.35,0.38,0.40,0.30,0.48,0.80],y26:[0.72,0.48,0.42],t:0.14},
 };
 const EST={
   total:9195315.62,
   arm:[{cod:'2A',v:3403705.13},{cod:'3OA',v:1904695.87},{cod:'3SA',v:1423011.78},{cod:'3TA',v:1216093.30},{cod:'3XA',v:935500.80},{cod:'3AV',v:272390.45},{cod:'2AC',v:36511.25}],
-  prod:[{n:'MACHINES',v:4695064.89,it:360,sh:51.1,d:0.0},{n:'CAPSULES',v:3616813.70,it:1013,sh:39.3,d:0.2},{n:'LES COLLECTIONS',v:735413.07,it:460,sh:8.0,d:0.0},{n:'MILK DEVICES',v:102424.68,it:19,sh:1.1,d:null},{n:'SPARE PARTS',v:41160.78,it:91,sh:0.4,d:0.0},{n:'FOODS & BITES',v:4398.24,it:3,sh:0.0,d:null}]
+  prod:[{n:'MACHINES',v:4695064.89,it:360,sh:51.1,d:0.0},{n:'CAPSULES',v:3616813.70,it:1013,sh:39.3,d:0.2},{n:'LES COLLECTIONS',v:735413.07,it:460,sh:8.0,d:0.0},{n:'MILK DEVICES',v:102424.68,it:19,sh:1.1,d:null},{n:'SPARE PARTS',v:41160.78,it:91,sh:0.4,d:0.0},{n:'FOODS & BITES',v:4398.24,it:3,sh:0.0,d:null}],
+  kpis:{
+    valor_total:   9195315.62,
+    skus_ativos:   1586,
+    giro:          4.2,
+    acuracidade:   97.3,
+    rupturas:      48,
+    cobertura_dias:22,
+    estoque_parado:312480.50,
+    perdas_avarias:18920.30,
+    fill_rate:     94.7,
+  },
+  top10_criticos:[
+    {sku:'CAP-ARPEG-10',nome:'Cápsula Arpeggio 10un',estoque:12,minimo:50,cobertura:2,status:'critico'},
+    {sku:'CAP-ROMAZ-10',nome:'Cápsula Roma Zero 10un',estoque:8,minimo:50,cobertura:1,status:'critico'},
+    {sku:'MAC-ESSENZ-A',nome:'Máq. Essenza Mini Cinza',estoque:3,minimo:20,cobertura:1,status:'critico'},
+    {sku:'CAP-VOLUT-10',nome:'Cápsula Voluttuoso 10un',estoque:25,minimo:80,cobertura:4,status:'alerta'},
+    {sku:'CAP-NAPOLI-10',nome:'Cápsula Napoli 10un',estoque:18,minimo:60,cobertura:3,status:'alerta'},
+    {sku:'MAC-PIXEL-W',nome:'Máq. Nespresso Pixie Branca',estoque:6,minimo:15,cobertura:3,status:'alerta'},
+    {sku:'CAP-KAZAAR-10',nome:'Cápsula Kazaar 10un',estoque:32,minimo:80,cobertura:5,status:'alerta'},
+    {sku:'MILK-AEROC-W',nome:'Aeroccino 4 Branco',estoque:4,minimo:10,cobertura:4,status:'alerta'},
+    {sku:'CAP-DHARKAN-10',nome:'Cápsula Dharkan 10un',estoque:41,minimo:80,cobertura:6,status:'atencao'},
+    {sku:'CAP-LIVANTO-10',nome:'Cápsula Livanto 10un',estoque:55,minimo:100,cobertura:7,status:'atencao'},
+  ]
 };
 
 // ════════════════════════════
@@ -749,7 +915,7 @@ function renderBacklog(){
         <td class="r">${r.i0||'—'}</td><td class="r">${r.e0||'—'}</td></tr>`).join('')+
       `<tr class="total"><td>Total</td><td class="r">${f(tot.p)}</td><td class="r">${f(tot.i)}</td><td class="r">—</td><td class="r bl">${f(tot.bl)}</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>`;
   });
-  [{id:'ch-bl-sp',t:'Backlog — SP',k:'SP'},{id:'ch-bl-rj',t:'Backlog — RJ',k:'RJ'},{id:'ch-bl-pe',t:'Backlog — PE',k:'PE'},{id:'ch-bl-dark',t:'Backlog — Dark',k:'DARK'}]
+  [{id:'ch-bl-sp',t:'Backlog — SP',k:'SP'},{id:'ch-bl-rj',t:'Backlog — RJ',k:'RJ'},{id:'ch-bl-pe',t:'Backlog — PE',k:'PE'},{id:'ch-bl-dark',t:'Backlog — Dark BSB',k:'BSB'},{id:'ch-bl-poa',t:'Backlog — Dark POA',k:'POA'}]
   .forEach(c=>histChart(c.id,c.t,BL.hist[c.k]));
 }
 
@@ -780,7 +946,80 @@ function renderComplaints(){
 // ════════════════════════════
 // RENDER ESTOQUE
 // ════════════════════════════
+let chEstGiro=null;
 function renderEstoque(){
+  const k=EST.kpis;
+
+  // KPI row 1 — 5 KPIs principais
+  document.getElementById('kpis-est').innerHTML=`
+    <div class="kpi kpi-blue">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+      <div class="kpi-lbl">💰 Valor do Estoque</div>
+      <div class="kpi-val">${'R$ '+(k.valor_total/1e6).toFixed(2).replace('.',',')}M</div>
+      <div class="kpi-delta delta-neu">todos os armazéns</div>
+    </div>
+    <div class="kpi kpi-green">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+      <div class="kpi-lbl">📦 SKUs Ativos</div>
+      <div class="kpi-val">${f(k.skus_ativos)}</div>
+      <div class="kpi-delta delta-up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>itens monitorados</div>
+    </div>
+    <div class="kpi kpi-amber">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></div>
+      <div class="kpi-lbl">🔄 Giro de Estoque</div>
+      <div class="kpi-val">${fp(k.giro,1).replace('%','×')}</div>
+      <div class="kpi-delta delta-up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>rotações/mês</div>
+    </div>
+    <div class="kpi ${k.acuracidade>=97?'kpi-green':'kpi-amber'}">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="kpi-lbl">🎯 Acuracidade</div>
+      <div class="kpi-val">${fp(k.acuracidade,1)}</div>
+      <div class="kpi-delta ${k.acuracidade>=97?'delta-up':'delta-dn'}">meta: 97%</div>
+    </div>
+    <div class="kpi ${k.rupturas>30?'kpi-red':'kpi-amber'}">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div class="kpi-lbl">⚠️ Rupturas</div>
+      <div class="kpi-val ${k.rupturas>30?'':'kpi-val'}">${k.rupturas}</div>
+      <div class="kpi-delta delta-dn">SKUs zerados/críticos</div>
+    </div>`;
+
+  // KPI row 2 — 4 KPIs secundários
+  document.getElementById('kpis-est2').innerHTML=`
+    <div class="kpi kpi-blue">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div class="kpi-lbl">📅 Cobertura</div>
+      <div class="kpi-val">${k.cobertura_dias}d</div>
+      <div class="kpi-delta delta-neu">dias de estoque</div>
+    </div>
+    <div class="kpi kpi-amber">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+      <div class="kpi-lbl">📉 Estoque Parado</div>
+      <div class="kpi-val" style="font-size:22px">${fr(k.estoque_parado)}</div>
+      <div class="kpi-delta delta-dn">sem movimentação 90d+</div>
+    </div>
+    <div class="kpi kpi-red">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+      <div class="kpi-lbl">❌ Perdas/Avarias</div>
+      <div class="kpi-val" style="font-size:22px">${fr(k.perdas_avarias)}</div>
+      <div class="kpi-delta delta-dn">no mês corrente</div>
+    </div>
+    <div class="kpi ${k.fill_rate>=95?'kpi-green':'kpi-amber'}">
+      <div class="kpi-accent"></div>
+      <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <div class="kpi-lbl">🚚 Fill Rate</div>
+      <div class="kpi-val">${fp(k.fill_rate,1)}</div>
+      <div class="kpi-delta ${k.fill_rate>=95?'delta-up':'delta-dn'}">meta: 95%</div>
+    </div>`;
+
+  // Gráfico armazém
   document.getElementById('est-sub').textContent=`Total ${fr(EST.total)} · todos os armazéns`;
   if(chEst) chEst.destroy();
   chEst=new Chart(document.getElementById('ch-est').getContext('2d'),{
@@ -791,6 +1030,28 @@ function renderEstoque(){
       scales:{y:{ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k',font:{size:10},color:'#94a3b8'},grid:{color:'rgba(0,0,0,.04)'}},
               x:{ticks:{font:{size:11,weight:'700'},color:'#64748b'},grid:{display:false}}}}
   });
+
+  // Gráfico Giro vs Fill Rate por armazém
+  if(chEstGiro) chEstGiro.destroy();
+  chEstGiro=new Chart(document.getElementById('ch-est-giro').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:['CD SP','CD RJ','CD PE','Dark BSB','Dark POA'],
+      datasets:[
+        {label:'Fill Rate %',data:[95.2,91.4,97.8,88.3,94.1],backgroundColor:'#1a1a1a',borderRadius:4,yAxisID:'y'},
+        {label:'Giro (×)',data:[4.2,3.8,3.5,5.1,4.8],backgroundColor:'#94a3b8',borderRadius:4,yAxisID:'y2'},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11,weight:'600'},color:'#64748b'}}},
+      scales:{
+        y:{position:'left',ticks:{callback:v=>v+'%',font:{size:10},color:'#94a3b8'},grid:{color:'rgba(0,0,0,.04)'},min:80,max:100},
+        y2:{position:'right',ticks:{callback:v=>v+'×',font:{size:10},color:'#94a3b8'},grid:{display:false}},
+        x:{ticks:{font:{size:10},color:'#64748b'},grid:{display:false}}
+      }}
+  });
+
+  // Cards por produto
   document.getElementById('est-cards').innerHTML=EST.prod.map(p=>`
     <div class="est-card">
       <div class="est-name"><span class="est-dot"></span>${p.n}</div>
@@ -798,6 +1059,31 @@ function renderEstoque(){
       <div class="est-meta"><span style="font-size:11px;color:var(--muted)">${f(p.it)} itens</span><span style="font-size:11px;color:var(--muted)">Share: ${p.sh}%</span>${p.d!=null?`<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--green-lt);color:#065f46">+${p.d}%</span>`:'<span style="font-size:10px;color:var(--subtle)">Sem hist.</span>'}</div>
       <div class="est-bar-wrap"><div class="est-bar" style="width:${p.sh}%"></div></div>
     </div>`).join('');
+
+  // Top 10 SKUs críticos
+  document.getElementById('est-rupt-badge').textContent=`${k.rupturas} rupturas`;
+  const statusCfg={
+    critico:{cls:'pr',label:'Crítico'},
+    alerta: {cls:'pa',label:'Alerta'},
+    atencao:{cls:'p0',label:'Atenção'},
+  };
+  document.querySelector('#tbl-top10 tbody').innerHTML=EST.top10_criticos.map(s=>{
+    const pct=Math.round(s.estoque/s.minimo*100);
+    const sc=statusCfg[s.status]||statusCfg.atencao;
+    return`<tr>
+      <td><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">${s.sku}</span></td>
+      <td class="bold">${s.nome}</td>
+      <td class="r" style="color:${s.status==='critico'?'var(--red)':s.status==='alerta'?'var(--amber)':'var(--text)'};font-weight:700">${f(s.estoque)}</td>
+      <td class="r">${f(s.minimo)}</td>
+      <td class="r">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+          <div style="width:48px;height:4px;background:#f1f5f9;border-radius:99px;overflow:hidden"><div style="height:100%;width:${Math.min(pct,100)}%;background:${s.status==='critico'?'var(--red)':s.status==='alerta'?'var(--amber)':'var(--green)'};border-radius:99px"></div></div>
+          <span>${s.cobertura}d</span>
+        </div>
+      </td>
+      <td><span class="pct ${sc.cls}">${sc.label}</span></td>
+    </tr>`;
+  }).join('');
 }
 
 // ════════════════════════════
@@ -864,7 +1150,7 @@ async function carregarSB(){
   if(!sbOk) return;
   try{
     const dashboard=await sbFetch('vw_dashboard?select=*');
-    const map={'CD_SP':'SP','CD_RJ':'RJ','CD_PE':'PE','DS_BSB':'DARK','DS_POA':'DARK'};
+    const map={'CD_SP':'SP','CD_RJ':'RJ','CD_PE':'PE','DS_BSB':'BSB','DS_POA':'POA'};
     if(dashboard&&dashboard.length){
       dashboard.forEach(row=>{
         const k=map[row.codigo];if(!k||!UN[k])return;
@@ -885,6 +1171,7 @@ async function refreshAll(){
   ic.classList.add('spinning');
   await carregarSB();
   renderCarteira();renderBacklog();renderOtif();renderComplaints();renderEstoque();renderRanking();
+
   checkAlerts();
   ic.classList.remove('spinning');
   const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -968,6 +1255,348 @@ function updateSlRing(el){
   const pct=el/slInt;
   document.getElementById('sl-ring').style.strokeDashoffset=pct*81.7;
   document.getElementById('sl-num').textContent=Math.ceil((slInt-el)/1000);
+}
+
+// ════════════════════════════
+// TV MODE
+// ════════════════════════════
+const TV_SLIDES = [
+  { name:'Visão Geral',       next:'Carteira SP',       render: tvSlideGeral    },
+  { name:'Carteira SP',       next:'Transportadoras',   render: tvSlideCarteira },
+  { name:'Transportadoras',   next:'Mapa de Calor',     render: tvSlideTransp   },
+  { name:'Mapa de Calor',     next:'Hora × Hora',       render: tvSlideHeatmap  },
+  { name:'Hora × Hora',       next:'Backlog',           render: tvSlideHH       },
+  { name:'Backlog',           next:'OTIF & Complaints', render: tvSlideBacklog  },
+  { name:'🏆 Ranking',        next:'Visão Geral',       render: tvSlideRanking  },
+];
+const TV_INTERVAL = 12000;
+let tvIdx=0, tvTimer=null, tvProgTimer=null, tvCharts=[], tvActive=false;
+
+function startTV(){
+  tvActive=true;
+  const scr=document.getElementById('tv-screen');
+  scr.classList.add('active');
+  document.body.style.overflow='hidden';
+  // Copy logo to TV
+  const logoSrc=document.querySelector('.brand img');
+  if(logoSrc) document.getElementById('tv-logo-img').innerHTML=`<img src="${logoSrc.src}" style="height:26px;width:auto;object-fit:contain;filter:invert(1)">`;
+  tvStartClock();
+  goTV(0);
+  document.addEventListener('keydown',tvKey);
+}
+
+function stopTV(){
+  tvActive=false;
+  clearInterval(tvTimer);
+  clearInterval(tvProgTimer);
+  tvCharts.forEach(c=>{try{c.destroy();}catch(e){}});
+  tvCharts=[];
+  document.getElementById('tv-screen').classList.remove('active');
+  document.body.style.overflow='';
+  document.removeEventListener('keydown',tvKey);
+}
+
+function tvKey(e){
+  if(e.key==='Escape') stopTV();
+  else if(e.key==='ArrowRight') goTV(tvIdx+1);
+  else if(e.key==='ArrowLeft') goTV(tvIdx-1);
+}
+
+function tvStartClock(){
+  function tick(){
+    if(!tvActive) return;
+    const now=new Date();
+    document.getElementById('tv-clock').textContent=now.toLocaleTimeString('pt-BR');
+    document.getElementById('tv-date').textContent=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    setTimeout(tick,1000);
+  }
+  tick();
+}
+
+function buildTVDots(){
+  document.getElementById('tv-dots').innerHTML=TV_SLIDES.map((_,i)=>
+    `<div onclick="goTV(${i})" class="tv-slide-dot${i===tvIdx?' active':''}" style="width:${i===tvIdx?'24px':'7px'}"></div>`
+  ).join('');
+}
+
+function goTV(i){
+  tvIdx=((i%TV_SLIDES.length)+TV_SLIDES.length)%TV_SLIDES.length;
+  const s=TV_SLIDES[tvIdx];
+  const nx=TV_SLIDES[(tvIdx+1)%TV_SLIDES.length];
+  document.getElementById('tv-current-name').textContent=s.name;
+  document.getElementById('tv-next-name').textContent=`próximo: ${nx.name}`;
+  buildTVDots();
+  // Destroy old charts
+  tvCharts.forEach(c=>{try{c.destroy();}catch(e){}});
+  tvCharts=[];
+  // Render new slide
+  const body=document.getElementById('tv-body');
+  body.innerHTML='';
+  const slide=document.createElement('div');
+  slide.className='tv-slide active';
+  body.appendChild(slide);
+  s.render(slide);
+  // Reset timer
+  clearInterval(tvTimer);
+  clearInterval(tvProgTimer);
+  let elapsed=0;
+  document.getElementById('tv-prog-fill').style.width='0%';
+  tvProgTimer=setInterval(()=>{
+    elapsed+=100;
+    document.getElementById('tv-prog-fill').style.width=(elapsed/TV_INTERVAL*100)+'%';
+    if(elapsed>=TV_INTERVAL){clearInterval(tvProgTimer);goTV(tvIdx+1);}
+  },100);
+}
+
+// ── TV SLIDE: GERAL ──
+function tvSlideGeral(el){
+  const d=UN['SP'];
+  const units=Object.entries(UN);
+  // KPI strip top
+  const strip=document.createElement('div');
+  strip.className='tv-kpi-strip';
+  strip.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px';
+  const totExp=sum(d.transp,'exp'),totTot=sum(d.transp,'total');
+  const pctFin=totTot>0?+(totExp/totTot*100).toFixed(1):0;
+  const kpis=[
+    {lbl:'Integração Total D-1',val:f(d.kpis.int_total),sub:'pedidos CD SP',color:'#60a5fa',alert:false},
+    {lbl:'Expedição 00h',val:f(d.kpis.exp_00h),sub:`${fp(pctFin,1)} do total`,color:'#4ade80',alert:false},
+    {lbl:'Backlog Total',val:f(d.kpis.backlog),sub:'pedidos em atraso',color:d.kpis.backlog>0?'#f87171':'#4ade80',alert:d.kpis.backlog>100},
+    {lbl:'SLA CD SP',val:fp(d.sla,1),sub:`meta ${fp(d.meta,0)}`,color:d.sla>=85?'#4ade80':d.sla>=70?'#fbbf24':'#f87171',alert:d.sla<85},
+  ];
+  strip.innerHTML=kpis.map(k=>`
+    <div class="tv-kpi${k.alert?' alert-tv':''}" style="border-top:2px solid ${k.color}40">
+      <div class="tv-kpi-lbl">${k.lbl}</div>
+      <div class="tv-kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="tv-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+  el.appendChild(strip);
+  // Units table
+  const g=document.createElement('div');
+  g.className='tv-g2';
+  const tbl=document.createElement('div');tbl.className='tv-card';
+  tbl.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">Status por Unidade</div><div class="tv-card-sub">visão consolidada</div></div>
+    <div class="tv-tbl-wrap"><table class="tv-tbl">
+      <thead><tr><th>Unidade</th><th class="r">Integrado</th><th class="r">Expedido</th><th class="r">Backlog</th><th class="r">SLA</th></tr></thead>
+      <tbody>${units.map(([k,u])=>{
+        const slaC=u.sla>=85?'#4ade80':u.sla>=70?'#fbbf24':u.sla>0?'#f87171':'#94a3b8';
+        const blC=u.kpis.backlog>0?'#f87171':'#4ade80';
+        return`<tr>
+          <td style="font-weight:700;color:rgba(255,255,255,.85)">${u.nome}</td>
+          <td class="r">${f(u.kpis.int_total)}</td>
+          <td class="r">${f(u.kpis.exp_00h)}</td>
+          <td class="r" style="color:${blC};font-weight:700">${f(u.kpis.backlog)}</td>
+          <td class="r" style="color:${slaC};font-weight:700">${u.sla>0?fp(u.sla,1):'—'}</td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table></div>`;
+  // Ranking mini
+  const rank=document.createElement('div');rank.className='tv-card';
+  const scores=units.map(([k,u])=>({nome:u.nome,score:u.sla,cidade:u.cidade})).sort((a,b)=>b.score-a.score);
+  const rankColors=['#fbbf24','#94a3b8','#d97706','#64748b','#475569'];
+  const medals=['🥇','🥈','🥉','4°','5°'];
+  rank.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">🏆 Ranking SLA</div></div>
+    ${scores.map((s,i)=>`<div class="tv-rank-item">
+      <div class="tv-rank-num" style="background:rgba(255,255,255,.06);color:${rankColors[i]}">${medals[i]}</div>
+      <div style="flex:1"><div class="tv-rank-name">${s.nome}</div>
+        <div class="tv-rank-bar-wrap"><div class="tv-rank-bar" style="width:${s.score}%;background:${rankColors[i]}"></div></div>
+      </div>
+      <div class="tv-rank-score" style="color:${rankColors[i]}">${s.score>0?fp(s.score,1):'—'}</div>
+    </div>`).join('')}`;
+  g.appendChild(tbl);g.appendChild(rank);
+  el.appendChild(g);
+}
+
+// ── TV SLIDE: CARTEIRA ──
+function tvSlideCarteira(el){
+  const d=UN['SP'];
+  const tC={total:sum(d.canais,'total'),fin:sum(d.canais,'fin')};
+  const tCp=tC.total?+(tC.fin/tC.total*100).toFixed(2):0;
+  const g=document.createElement('div');g.className='tv-g2';
+  // Canal table
+  const ct=document.createElement('div');ct.className='tv-card';
+  ct.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">Por Canal — CD SP</div></div>
+    <div class="tv-tbl-wrap"><table class="tv-tbl">
+      <thead><tr><th>Canal</th><th class="r">Total</th><th class="r">Finalizado</th><th class="r">Pendente</th><th class="r">% Fin.</th></tr></thead>
+      <tbody>${d.canais.map(r=>`<tr><td style="font-weight:700;color:rgba(255,255,255,.85)">${r.c}</td><td class="r">${f(r.total)}</td><td class="r">${f(r.fin)}</td><td class="r">${f(r.total-r.fin)}</td><td class="r" style="color:${r.pct>=80?'#4ade80':r.pct>=50?'#fbbf24':'#f87171'};font-weight:700">${fp(r.pct,2)}</td></tr>`).join('')}
+        <tr class="tv-total"><td>Total</td><td class="r">${f(tC.total)}</td><td class="r">${f(tC.fin)}</td><td class="r">${f(tC.total-tC.fin)}</td><td class="r" style="font-weight:700;color:${tCp>=80?'#4ade80':tCp>=50?'#fbbf24':'#f87171'}">${fp(tCp,2)}</td></tr>
+      </tbody></table></div>`;
+  // Gauges
+  const gd=document.createElement('div');gd.className='tv-card';
+  gd.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">SLA & Finalização</div></div>
+    <div class="tv-gauge-row" style="min-height:200px"><div id="tvg-sla" class="tv-gauge-cell"></div><div id="tvg-fin" class="tv-gauge-cell"></div></div>`;
+  g.appendChild(ct);g.appendChild(gd);
+  el.appendChild(g);
+  setTimeout(()=>{
+    tvDrawGauge('tvg-sla',d.sla,'SLA %','#60a5fa',d.meta);
+    tvDrawGauge('tvg-fin',sum(d.transp,'exp')/sum(d.transp,'total')*100,'Finalizado','#4ade80',d.meta);
+  },50);
+}
+
+// ── TV SLIDE: TRANSPORTADORAS ──
+function tvSlideTransp(el){
+  const d=UN['SP'];
+  const tT={total:sum(d.transp,'total'),exp:sum(d.transp,'exp')};
+  const tTp=tT.total?+(tT.exp/tT.total*100).toFixed(2):0;
+  const g=document.createElement('div');g.className='tv-g2';
+  // Table
+  const ct=document.createElement('div');ct.className='tv-card';
+  ct.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">Por Transportadora — CD SP</div></div>
+    <div class="tv-tbl-wrap"><table class="tv-tbl">
+      <thead><tr><th>Transportadora</th><th>Corte</th><th class="r">Total</th><th class="r">Expedido</th><th class="r">Pendente</th><th class="r">% Fin.</th></tr></thead>
+      <tbody>${d.transp.map(r=>{const c=r.pct>=80?'#4ade80':r.pct>=50?'#fbbf24':'#f87171';return`<tr><td style="font-weight:700;color:rgba(255,255,255,.85)">${r.n}</td><td style="color:rgba(255,255,255,.4)">${r.c}</td><td class="r">${f(r.total)}</td><td class="r">${f(r.exp)}</td><td class="r">${f(r.pend||r.total-r.exp)}</td><td class="r" style="color:${c};font-weight:700">${fp(r.pct,2)}</td></tr>`;}).join('')}
+        <tr class="tv-total"><td colspan="2">Total</td><td class="r">${f(tT.total)}</td><td class="r">${f(tT.exp)}</td><td class="r">${f(tT.total-tT.exp)}</td><td class="r" style="color:${tTp>=80?'#4ade80':tTp>=50?'#fbbf24':'#f87171'};font-weight:700">${fp(tTp,2)}</td></tr>
+      </tbody></table></div>`;
+  // Progress bars
+  const pr=document.createElement('div');pr.className='tv-card';
+  pr.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">% Finalizado</div></div>
+    <div class="tv-prog">${d.transp.map(t=>{const fc=t.pct>=80?'#4ade80':t.pct>=50?'#fbbf24':'#f87171';return`<div class="tv-prog-item">
+      <div class="tv-prog-head"><span class="tv-prog-name">${t.n} <span style="color:rgba(255,255,255,.3);font-size:10px">${t.c}</span></span><span class="tv-prog-val" style="color:${fc}">${fp(t.pct,2)}</span></div>
+      <div class="tv-prog-track"><div class="tv-prog-fill" style="width:${t.pct}%;background:${fc}"></div></div>
+    </div>`;}).join('')}</div>`;
+  g.appendChild(ct);g.appendChild(pr);
+  el.appendChild(g);
+}
+
+// ── TV SLIDE: HEATMAP ──
+function tvSlideHeatmap(el){
+  const units=Object.entries(UN);
+  const card=document.createElement('div');card.className='tv-card';
+  const cols=5;
+  const transp_names=['Correios','Fast','RN','Dialogo','Logan','Dissudes','Log Servico'];
+  let rows='';
+  units.forEach(([k,u])=>{
+    rows+=`<tr style="border-bottom:1px solid rgba(255,255,255,.04)">
+      <td style="padding:7px 14px;font-weight:700;color:rgba(255,255,255,.8);font-size:12px">${u.nome}</td>`;
+    u.transp.slice(0,4).forEach(t=>{
+      const hc=heatColor(t.pct);
+      rows+=`<td style="padding:5px 8px"><div style="background:${hc.bg};color:${hc.c};border-radius:6px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--mono)">${Math.round(t.pct)}%</div></td>`;
+    });
+    rows+='</tr>';
+  });
+  card.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">Mapa de Calor — % Finalizado por Unidade × Transportadora</div><div class="tv-card-sub">verde ≥85% · amarelo ≥50% · vermelho &lt;50%</div></div>
+    <table class="tv-tbl" style="width:100%">
+      <thead><tr><th>Unidade</th><th>Principal</th><th>2ª transp.</th><th>3ª transp.</th><th>4ª transp.</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  el.appendChild(card);
+}
+
+// ── TV SLIDE: HORA A HORA ──
+function tvSlideHH(el){
+  const d=UN['SP'];
+  const g=document.createElement('div');g.className='tv-g2';
+  // Table
+  const ct=document.createElement('div');ct.className='tv-card';
+  const hh=d.hh.filter(h=>h.tot>0);
+  const tot={b2b:sum(hh,'b2b'),b2c:sum(hh,'b2c'),tot:sum(hh,'tot')};
+  ct.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">Hora × Hora — CD SP</div><div class="tv-card-sub">expedição acumulada</div></div>
+    <div class="tv-tbl-wrap"><table class="tv-tbl">
+      <thead><tr><th>Hora</th><th class="r">B2B</th><th class="r">B2C</th><th class="r">Total</th></tr></thead>
+      <tbody>${hh.map(r=>`<tr><td style="color:rgba(255,255,255,.7)">${r.h}</td><td class="r">${r.b2b||'—'}</td><td class="r">${f(r.b2c)}</td><td class="r" style="font-weight:700">${f(r.tot)}</td></tr>`).join('')}
+        <tr class="tv-total"><td>Total</td><td class="r">${f(tot.b2b)}</td><td class="r">${f(tot.b2c)}</td><td class="r">${f(tot.tot)}</td></tr>
+      </tbody></table></div>`;
+  // Chart
+  const ch=document.createElement('div');ch.className='tv-card';
+  ch.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">Tendência</div></div><div style="padding:12px 16px;height:220px"><canvas id="tv-ch-hh"></canvas></div>`;
+  g.appendChild(ct);g.appendChild(ch);el.appendChild(g);
+  setTimeout(()=>{
+    const ctx=document.getElementById('tv-ch-hh');if(!ctx)return;
+    let acc=0;const accD=hh.map(h=>{acc+=h.tot;return acc;});
+    const c=new Chart(ctx.getContext('2d'),{type:'line',
+      data:{labels:hh.map(h=>h.h),datasets:[
+        {label:'Acumulado',data:accD,borderColor:'#fff',backgroundColor:'rgba(255,255,255,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#0a0a0a',pointBorderColor:'#fff',pointBorderWidth:2},
+        {label:'Por hora',data:hh.map(h=>h.tot),borderColor:'rgba(255,255,255,.3)',fill:false,tension:.4,pointRadius:3,borderDash:[4,3]},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{y:{ticks:{font:{size:10},color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.06)'}},
+                x:{ticks:{font:{size:10},color:'rgba(255,255,255,.3)'},grid:{display:false}}}}
+    });
+    tvCharts.push(c);
+  },100);
+}
+
+// ── TV SLIDE: BACKLOG ──
+function tvSlideBacklog(el){
+  const g=document.createElement('div');g.className='tv-g2';
+  ['b2b','b2c'].forEach(tipo=>{
+    const rows=BL[tipo];
+    const tot={p:sum(rows,'p'),i:sum(rows,'i'),bl:sum(rows,'bl')};
+    const ct=document.createElement('div');ct.className='tv-card';
+    ct.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">Backlog ${tipo.toUpperCase()} — CD SP</div></div>
+      <div class="tv-tbl-wrap"><table class="tv-tbl">
+        <thead><tr><th>Data</th><th class="r">Planejado</th><th class="r">Integrado</th><th class="r">Backlog</th><th class="r">% BL</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr>
+          <td style="color:rgba(255,255,255,.7)">${r.d}</td><td class="r">${f(r.p)}</td><td class="r">${r.i||'—'}</td>
+          <td class="r" style="color:${r.bl>0?'#f87171':'rgba(255,255,255,.4)'};font-weight:${r.bl>0?700:400}">${r.bl||'0'}</td>
+          <td class="r" style="color:${r.pb>0.80?'#f87171':r.pb>0?'#fbbf24':'rgba(255,255,255,.3)'}">${r.pb!=null?fp(r.pb,2):'—'}</td>
+        </tr>`).join('')}
+        <tr class="tv-total"><td>Total</td><td class="r">${f(tot.p)}</td><td class="r">${f(tot.i)}</td><td class="r" style="color:#f87171;font-weight:700">${f(tot.bl)}</td><td class="r">—</td></tr>
+        </tbody></table></div>`;
+    g.appendChild(ct);
+  });
+  el.appendChild(g);
+}
+
+// ── TV SLIDE: RANKING ──
+function tvSlideRanking(el){
+  const g=document.createElement('div');g.className='tv-g2';
+  // SLA ranking
+  const slaRank=Object.entries(UN).map(([k,u])=>({nome:u.nome,cidade:u.cidade,sla:u.sla,fin:u.kpis.exp_00h/u.kpis.int_total*100})).sort((a,b)=>b.sla-a.sla);
+  const colors=['#fbbf24','#94a3b8','#d97706','#64748b','#475569'];
+  const medals=['🥇','🥈','🥉','4°','5°'];
+  const r1=document.createElement('div');r1.className='tv-card';
+  r1.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">🏆 Ranking SLA</div><div class="tv-card-sub">melhor para pior</div></div>
+    ${slaRank.map((s,i)=>`<div class="tv-rank-item">
+      <div class="tv-rank-num" style="background:rgba(255,255,255,.06);color:${colors[i]};font-size:14px">${medals[i]}</div>
+      <div style="flex:1">
+        <div class="tv-rank-name">${s.nome}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3)">${s.cidade}</div>
+        <div class="tv-rank-bar-wrap"><div class="tv-rank-bar" style="width:${s.sla}%;background:${colors[i]}"></div></div>
+      </div>
+      <div class="tv-rank-score" style="color:${colors[i]}">${s.sla>0?fp(s.sla,1):'—'}</div>
+    </div>`).join('')}`;
+  // Fin ranking
+  const finRank=[...slaRank].sort((a,b)=>b.fin-a.fin);
+  const r2=document.createElement('div');r2.className='tv-card';
+  r2.innerHTML=`<div class="tv-card-head"><div class="tv-card-title">📦 Ranking % Finalizado</div><div class="tv-card-sub">expedidos ÷ integrados</div></div>
+    ${finRank.map((s,i)=>`<div class="tv-rank-item">
+      <div class="tv-rank-num" style="background:rgba(255,255,255,.06);color:${colors[i]};font-size:14px">${medals[i]}</div>
+      <div style="flex:1">
+        <div class="tv-rank-name">${s.nome}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3)">${s.cidade}</div>
+        <div class="tv-rank-bar-wrap"><div class="tv-rank-bar" style="width:${Math.min(s.fin||0,100)}%;background:${colors[i]}"></div></div>
+      </div>
+      <div class="tv-rank-score" style="color:${colors[i]}">${isFinite(s.fin)&&s.fin>0?fp(s.fin,1):'—'}</div>
+    </div>`).join('')}`;
+  g.appendChild(r1);g.appendChild(r2);
+  el.appendChild(g);
+}
+
+// ── TV GAUGE ──
+function tvDrawGauge(id,pct,label,color,meta){
+  const el=document.getElementById(id);if(!el)return;
+  const c=Math.min(Math.max(pct||0,0),100),m=Math.min(Math.max(meta,0),100);
+  const cx=90,cy=90,r=68;
+  const toXY=a=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+  const sa=Math.PI,ea=2*Math.PI;
+  const pa=sa+(c/100)*(ea-sa),ma=sa+(m/100)*(ea-sa);
+  const[px,py]=toXY(pa),[mx,my]=toXY(ma);
+  const lf=c>50?1:0;
+  el.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;width:100%">
+    <svg width="150" height="80" viewBox="0 0 180 95" style="max-width:100%;overflow:visible">
+      <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12" stroke-linecap="round"/>
+      <path d="M ${cx-r} ${cy} A ${r} ${r} 0 ${lf} 1 ${px.toFixed(1)} ${py.toFixed(1)}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round"/>
+      <line x1="${mx.toFixed(1)}" y1="${my.toFixed(1)}" x2="${(cx+(r+8)*Math.cos(ma)).toFixed(1)}" y2="${(cy+(r+8)*Math.sin(ma)).toFixed(1)}" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" font-size="22" fill="${color}">${fp(c,1)}</text>
+      <text x="${cx}" y="${cy+8}" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="rgba(255,255,255,.3)" font-weight="700">${label.toUpperCase()}</text>
+    </svg>
+    <div style="display:flex;gap:12px;margin-top:2px">
+      <div style="text-align:center"><div style="font-size:12px;font-weight:800;color:${color}">${fp(c,1)}</div><div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Realizado</div></div>
+      <div style="text-align:center"><div style="font-size:12px;font-weight:800;color:#f87171">${fp(m,0)}</div><div style="font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px">Meta</div></div>
+    </div>
+  </div>`;
 }
 
 // ════════════════════════════
