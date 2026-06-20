@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard KPI – Nespresso Logística</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e0d0;font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;min-height:100vh}
+:root{--gold:#b89a4e;--goldlt:#d4b96a;--golddk:#7a6330;--surface:#181818;--card:#1e1e1e;--border:#2a2a2a;--muted:#888070;--green:#3aaa5c;--red:#cc3333;--amber:#e08c1a;--teal:#3a9a9a}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── API KEY SCREEN ── */
+#api-screen{position:fixed;inset:0;z-index:500;background:#0d0d0d;display:flex;align-items:center;justify-content:center}
+.api-box{background:#181818;border:1px solid var(--golddk);border-radius:10px;padding:40px 48px;max-width:460px;width:90%;text-align:center}
+.api-box .logo{font-size:32px;font-family:Georgia,serif;font-weight:700;color:var(--gold);margin-bottom:4px}
+.api-box h2{font-size:18px;font-weight:700;color:#e8e0d0;margin-bottom:8px}
+.api-box p{color:var(--muted);font-size:12px;line-height:1.7;margin-bottom:24px}
+.api-input{width:100%;background:#111;border:1px solid var(--border);border-radius:4px;padding:10px 14px;color:#e8e0d0;font-size:13px;font-family:monospace;margin-bottom:12px;outline:none}
+.api-input:focus{border-color:var(--gold)}
+.api-btn{width:100%;background:var(--golddk);color:var(--goldlt);border:1px solid var(--gold);border-radius:4px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.api-btn:hover{background:var(--gold);color:#000}
+.api-note{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6}
+.api-note a{color:var(--goldlt)}
+
+/* ── PROCESSING ── */
+#proc{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.93);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#proc.on{display:flex}
+.spinner{width:44px;height:44px;border:3px solid #333;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+
+/* ── HEADER ── */
+header{background:linear-gradient(135deg,#0d0d0d,#1a1508);border-bottom:1px solid var(--golddk);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.btn{background:var(--golddk);color:var(--goldlt);border:1px solid var(--gold);border-radius:4px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn:hover{background:var(--gold);color:#000}
+.btn-sm{padding:5px 10px;font-size:11px}
+
+/* ── NAV ── */
+nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 12px;overflow-x:auto;scrollbar-width:none}
+.tab{padding:10px 14px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── LAYOUT ── */
+.pg{display:none;padding:16px 20px 40px}.pg.on{display:block}
+.krow{display:grid;gap:10px;margin-bottom:16px}
+.kc{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--golddk);border-radius:4px;padding:11px 13px;text-align:center}
+.kc .v{font-family:Georgia,serif;font-size:27px;font-weight:700;color:var(--gold);line-height:1.1}
+.kc .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.kc.g{border-top-color:var(--green)}.kc.g .v{color:var(--green)}
+.kc.a{border-top-color:var(--amber)}.kc.a .v{color:var(--amber)}
+.kc.r{border-top-color:var(--red)}.kc.r .v{color:var(--red)}
+.kc.t{border-top-color:var(--teal)}.kc.t .v{color:var(--teal)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+
+/* ── TABLES ── */
+.tc{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.th2{background:var(--surface);padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--goldlt);border-bottom:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+th{background:#111;padding:6px 8px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);text-align:right;border-bottom:1px solid var(--border)}
+th:first-child{text-align:left}
+td{padding:6px 8px;border-bottom:1px solid #222;text-align:right;font-size:12px;color:#e8e0d0}
+td:first-child{text-align:left}
+.bld td{font-weight:700;border-top:1px solid var(--border)}
+tr:nth-child(odd) td{background:rgba(255,255,255,.02)}
+.bd{display:inline-block;padding:2px 6px;border-radius:3px;font-size:11px;font-weight:700}
+.bg{background:#1a4a2a;color:#4fdc80}.ba{background:#4a3000;color:#ffa040}.br{background:#3a0a0a;color:#ff5555}
+
+/* ── CHARTS ── */
+.cb{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:13px}
+.cb h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--goldlt);margin-bottom:8px}
+.cw{position:relative;height:185px}
+
+/* ── TARGETS ── */
+.tr-row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.tb{border:1px solid var(--border);border-radius:3px;padding:7px 14px;text-align:center;min-width:100px}
+.tb .tl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tb .tv{font-size:19px;font-family:Georgia,serif;font-weight:700}
+.ok{color:var(--green)}.ng{color:var(--red)}.gd{color:var(--gold)}
+
+/* ── PAGE TITLE ── */
+.ptitle{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.ptitle h1{font-size:17px;font-weight:700;color:#e8e0d0;font-family:Georgia,serif}
+.ptitle span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+/* ── ESTOQUE ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px;margin-top:10px}
+.si{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:11px 13px}
+
+/* ── BANNER ── */
+#banner{display:none;background:#1a2a0a;border-bottom:1px solid #3a6a1a;padding:9px 18px;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#8fdc6f}
+</style>
+</head>
+<body>
+
+<!-- ══ API KEY SCREEN ══ -->
+<div id="api-screen">
+  <div class="api-box">
+    <div class="logo">N</div>
+    <h2>NESPRESSO · Dashboard KPI</h2>
+    <p>Para usar o upload automático de PDF com IA,<br>insira sua chave de API da Anthropic abaixo.<br>A chave fica salva apenas no seu navegador (localStorage).</p>
+    <input class="api-input" id="api-key-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off">
+    <button class="api-btn" onclick="saveKey()">Entrar no Dashboard</button>
+    <div class="api-note">
+      Obtenha sua chave em <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a><br>
+      A chave é armazenada localmente e nunca enviada a terceiros.
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROCESSING ══ -->
+<div id="proc">
+  <div class="spinner"></div>
+  <div style="color:var(--goldlt);font-size:14px;font-weight:600">Analisando PDF com Claude AI…</div>
+  <div id="pmsg" style="color:var(--muted);font-size:12px">Aguarde…</div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="font-size:22px;font-family:Georgia,serif;font-weight:700;color:var(--gold)">N</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#e8e0d0;letter-spacing:1px">NESPRESSO</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px">Supply Chain · Dashboard KPI</div>
+    </div>
+    <span id="fbadge" style="display:none;background:#1a2a1a;border:1px solid #3a6a3a;border-radius:20px;padding:2px 9px;font-size:11px;color:#6fdc8f;margin-left:6px"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="font-size:11px;color:var(--muted);text-align:right">
+      <div style="color:var(--goldlt);font-size:12px;font-weight:600">Luft Logistics · CD Araçariguama</div>
+      <span id="periodo">Semana 23 · Jun 2026</span>
+    </div>
+    <button class="btn" onclick="document.getElementById('fi').click()">↑ Atualizar PDF</button>
+    <button class="btn btn-sm" onclick="changeKey()" title="Trocar API Key">🔑</button>
+    <input id="fi" type="file" accept="application/pdf" style="display:none">
+  </div>
+</header>
+
+<div id="banner">
+  <span id="bmsg"></span>
+  <button onclick="document.getElementById('banner').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px">×</button>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <button class="tab on" onclick="go('bsp',this)">Backlog SP</button>
+  <button class="tab" onclick="go('csp',this)">Carteira SP</button>
+  <button class="tab" onclick="go('crj',this)">Carteira RJ</button>
+  <button class="tab" onclick="go('cpe',this)">Carteira PE</button>
+  <button class="tab" onclick="go('cdk',this)">Dark Store</button>
+  <button class="tab" onclick="go('bkpi',this)">KPI Backlog</button>
+  <button class="tab" onclick="go('otif',this)">BTQ OTIF</button>
+  <button class="tab" onclick="go('comp',this)">Complaints</button>
+  <button class="tab" onclick="go('est',this)">Estoque</button>
+</nav>
+
+<!-- ══ BACKLOG SP ══ -->
+<div id="pg-bsp" class="pg on">
+  <div class="ptitle"><h1>Backlog CD SP</h1><span id="sub-bsp">D-1 · Semana 31/mai – 06/jun</span></div>
+  <div class="krow" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kc"><div class="v" id="k1">3.425</div><div class="l">Integração Total SP D-1</div></div>
+    <div class="kc r"><div class="v" id="k2">2</div><div class="l">Backlog Total SP D-1</div></div>
+    <div class="kc t"><div class="v" id="k3">3.327</div><div class="l">Integração 00h</div></div>
+    <div class="kc"><div class="v" id="k4">3.359</div><div class="l">Expedição 00h</div></div>
+  </div>
+  <div class="g2">
+    <div class="tc"><div class="th2">Backlog B2B – CD SP</div>
+      <div style="overflow-x:auto"><table><thead><tr><th style="text-align:left">Data</th><th>Planejado</th><th>Int.Corte</th><th>% Var.</th><th style="color:var(--red)">Backlog</th><th>% BL</th><th>Int.00h</th><th>Exp.00h</th></tr></thead>
+      <tbody>
+        <tr><td>31/mai·dom</td><td>22</td><td>0</td><td style="color:var(--red)">-100%</td><td style="color:var(--muted)">0</td><td>–</td><td>0</td><td>–</td></tr>
+        <tr><td>01/jun·seg</td><td>477</td><td>658</td><td style="color:var(--green)">+37,95%</td><td style="color:var(--muted)">0</td><td>0,00%</td><td>785</td><td>883</td></tr>
+        <tr><td>02/jun·ter</td><td>402</td><td>441</td><td style="color:var(--green)">+9,70%</td><td style="color:var(--red)">2</td><td>0,45%</td><td>429</td><td>454</td></tr>
+        <tr><td>03/jun·qua</td><td>433</td><td>–</td><td style="color:var(--red)">-100%</td><td style="color:var(--muted)">0</td><td>–</td><td>–</td><td>3</td></tr>
+        <tr><td>04/jun·qui</td><td>140</td><td>–</td><td style="color:var(--red)">-100%</td><td style="color:var(--muted)">0</td><td>–</td><td>–</td><td>–</td></tr>
+        <tr><td>05/jun·sex</td><td>303</td><td>–</td><td style="color:var(--red)">-100%</td><td style="color:var(--muted)">0</td><td>–</td><td>–</td><td>–</td></tr>
+        <tr><td>06/jun·sáb</td><td>55</td><td>–</td><td style="color:var(--red)">-100%</td><td style="color:var(--muted)">0</td><td>–</td><td>–</td><td>–</td></tr>
+        <tr class="bld"><td>Total</td><td>1.832</td><td>1.099</td><td style="color:var(--red)">-40,01%</td><td style="color:var(--red)">2</td><td>0,18%</td><td>1.214</td><td>1.340</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="tc"><div class="th2">Backlog B2C – CD SP</div>
+      <div style="overflow-x:auto"><table><thead><tr><th style="text-align:left">Data</th><th>Planejado</th><th>Int.Corte</th><th>% Var.</th><th style="color:var(--red)">Backlog</th><th>% BL</th><th>Int.00h</th><th>Exp.00h</th></tr></thead>
+      <tbody>
+        <tr><td>31/mai·dom</td><td>1.089</td><td>0</td><td style="color:var(--red)">-100%</td><td style="color:var(--muted)">0</td><td>–</td><td>0</td><td>–</td></tr>
+        <tr><td>01/jun·seg</td><td>3.001</td><td>4.669</td><td style="color:var(--green)">+55,58%</td><td style="color:var(--muted)">0</td><td>0,00%</td><td>4.415</td><td>5.377</td></tr>
+        <tr><td>02/jun·ter</td><td>2.761</td><td>2.984</td><td style="color:var(--green)">+8,08%</td><td style="color:var(--muted)">0</td><td>0,00%</td><td>2.898</td><td>2.905</td></tr>
+        <tr><td>03/jun·qua</td><td>2.075</td><td>–</td><td style="color:var(--red)">-100%</td><td>–</td><td>–</td><td>–</td><td>28</td></tr>
+        <tr><td>04/jun·qui</td><td>2.272</td><td>–</td><td style="color:var(--red)">-100%</td><td>–</td><td>–</td><td>–</td><td>–</td></tr>
+        <tr><td>05/jun·sex</td><td>2.295</td><td>–</td><td style="color:var(--red)">-100%</td><td>–</td><td>–</td><td>–</td><td>–</td></tr>
+        <tr><td>06/jun·sáb</td><td>1.726</td><td>–</td><td style="color:var(--red)">-100%</td><td>–</td><td>–</td><td>–</td><td>–</td></tr>
+        <tr class="bld"><td>Total</td><td>15.219</td><td>7.653</td><td style="color:var(--red)">-49,71%</td><td style="color:var(--muted)">0</td><td>0,00%</td><td>7.313</td><td>8.310</td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARTEIRA SP ══ -->
+<div id="pg-csp" class="pg">
+  <div class="ptitle"><h1>Carteira de Pedidos – CD SP</h1><span>02/06 – 03/06/2026</span></div>
+  <div class="krow" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kc t"><div class="v" id="sp-ag">44</div><div class="l">Aging</div></div>
+    <div class="kc"><div class="v" id="sp-tot">1.105</div><div class="l">Total Pedidos</div></div>
+    <div class="kc g"><div class="v" id="sp-pct">75,28%</div><div class="l">% Finalizado</div></div>
+    <div class="kc a"><div class="v" id="sp-pen">1.090</div><div class="l">Pendentes</div></div>
+  </div>
+  <div class="g3">
+    <div class="tc"><div class="th2">Por Transportadora</div>
+      <table><thead><tr><th style="text-align:left">Transportadora</th><th>Total</th><th>Final.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>15h · Correios</td><td>925</td><td>749</td><td>176</td><td><span class="bd bg">80,97%</span></td></tr>
+        <tr><td>15h · Fast</td><td>8</td><td>4</td><td>4</td><td><span class="bd ba">50,00%</span></td></tr>
+        <tr><td>18h · RN</td><td>347</td><td>302</td><td>45</td><td><span class="bd bg">87,03%</span></td></tr>
+        <tr><td>20h · Diálogo</td><td>598</td><td>445</td><td>153</td><td><span class="bd ba">74,41%</span></td></tr>
+        <tr><td>20h40 · Logan</td><td>551</td><td>379</td><td>172</td><td><span class="bd ba">68,78%</span></td></tr>
+        <tr><td>21h · Dissudes</td><td>1.980</td><td>1.440</td><td>540</td><td><span class="bd ba">72,73%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>4.409</td><td>3.319</td><td>1.090</td><td><span class="bd ba">75,28%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Por Canal</div>
+      <table><thead><tr><th style="text-align:left">Canal</th><th>Total</th><th>Final.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr class="bld"><td>B2B</td><td>482</td><td>425</td><td>57</td><td><span class="bd bg">88,17%</span></td></tr>
+        <tr><td style="padding-left:16px">02/06</td><td>428</td><td>422</td><td>6</td><td><span class="bd bg">98,60%</span></td></tr>
+        <tr><td style="padding-left:16px">03/06</td><td>54</td><td>3</td><td>51</td><td><span class="bd br">5,56%</span></td></tr>
+        <tr class="bld"><td>B2C</td><td>3.927</td><td>2.894</td><td>1.033</td><td><span class="bd ba">73,69%</span></td></tr>
+        <tr><td style="padding-left:16px">02/06</td><td>2.892</td><td>2.866</td><td>26</td><td><span class="bd bg">99,10%</span></td></tr>
+        <tr><td style="padding-left:16px">03/06</td><td>1.035</td><td>28</td><td>1.007</td><td><span class="bd br">2,71%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>4.409</td><td>3.319</td><td>1.090</td><td><span class="bd ba">75,28%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Hora × Hora</div>
+      <table><thead><tr><th style="text-align:left">Hora</th><th>B2B</th><th>B2C</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr class="bld"><td>02/06/2026</td><td>454</td><td>2.905</td><td>3.359</td></tr>
+        <tr><td style="padding-left:12px">06h</td><td>26</td><td>98</td><td>124</td></tr>
+        <tr><td style="padding-left:12px">08h</td><td>32</td><td>171</td><td>203</td></tr>
+        <tr><td style="padding-left:12px">09h</td><td>19</td><td>285</td><td>304</td></tr>
+        <tr><td style="padding-left:12px">16h</td><td>20</td><td>390</td><td>410</td></tr>
+        <tr><td style="padding-left:12px">21h</td><td>32</td><td>209</td><td>241</td></tr>
+        <tr class="bld"><td>Total</td><td>457</td><td>2.933</td><td>3.390</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARTEIRA RJ ══ -->
+<div id="pg-crj" class="pg">
+  <div class="ptitle"><h1>Carteira de Pedidos – CD RJ</h1><span>02/06 – 03/06/2026</span></div>
+  <div class="krow" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kc t"><div class="v" id="rj1">322</div><div class="l">Em Carteira</div></div>
+    <div class="kc g"><div class="v" id="rj2">0</div><div class="l">Expedidos</div></div>
+    <div class="kc a"><div class="v" id="rj3">0</div><div class="l">Não Integrados</div></div>
+    <div class="kc a"><div class="v" id="rj4">0</div><div class="l">Cancelados</div></div>
+    <div class="kc r"><div class="v" id="rj5">0</div><div class="l">Backlogs</div></div>
+  </div>
+  <div class="g3">
+    <div class="tc"><div class="th2">Por Transportadora</div>
+      <table><thead><tr><th style="text-align:left">Transp.</th><th>Total</th><th>Exp.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>Correios</td><td>11</td><td>0</td><td>11</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr><td>Fast</td><td>286</td><td>0</td><td>286</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr><td>RN</td><td>25</td><td>0</td><td>25</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>322</td><td>0</td><td>322</td><td><span class="bd br">0,00%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Integ. até 12h</div>
+      <table><thead><tr><th style="text-align:left">Transp.</th><th>Total</th><th>Exp.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>Correios</td><td>11</td><td>0</td><td>11</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr><td>Fast</td><td>258</td><td>0</td><td>258</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr><td>RN</td><td>25</td><td>0</td><td>25</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>294</td><td>0</td><td>294</td><td><span class="bd br">0,00%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Por Canal</div>
+      <table><thead><tr><th style="text-align:left">Canal</th><th>Total</th><th>Exp.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>B2C</td><td>291</td><td>0</td><td>291</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr><td>B2B</td><td>31</td><td>0</td><td>31</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>322</td><td>0</td><td>322</td><td><span class="bd br">0,00%</span></td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARTEIRA PE ══ -->
+<div id="pg-cpe" class="pg">
+  <div class="ptitle"><h1>Carteira de Pedidos – CD PE</h1><span>02/06 – 03/06/2026</span></div>
+  <div class="krow" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kc t"><div class="v" id="pe1">111</div><div class="l">Integrados</div></div>
+    <div class="kc g"><div class="v" id="pe2">0</div><div class="l">Expedidos</div></div>
+    <div class="kc a"><div class="v" id="pe3">0</div><div class="l">Não Integrados</div></div>
+    <div class="kc a"><div class="v" id="pe4">0</div><div class="l">Cancelados</div></div>
+    <div class="kc r"><div class="v" id="pe5">0</div><div class="l">Backlogs</div></div>
+  </div>
+  <div class="g3">
+    <div class="tc"><div class="th2">Por Transportadora</div>
+      <table><thead><tr><th style="text-align:left">Data · Transp.</th><th>Total</th><th>Exp.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>02/06 · Correios</td><td>139</td><td>139</td><td>0</td><td><span class="bd bg">100%</span></td></tr>
+        <tr><td>02/06 · Log Svc</td><td>108</td><td>108</td><td>0</td><td><span class="bd bg">100%</span></td></tr>
+        <tr><td>03/06 · Log Svc</td><td>111</td><td>0</td><td>111</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>358</td><td>247</td><td>111</td><td><span class="bd ba">68,99%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Por Canal</div>
+      <table><thead><tr><th style="text-align:left">Canal</th><th>Total</th><th>Exp.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>B2C</td><td>353</td><td>242</td><td>111</td><td><span class="bd ba">68,56%</span></td></tr>
+        <tr><td>B2B</td><td>5</td><td>5</td><td>0</td><td><span class="bd bg">100%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>358</td><td>247</td><td>111</td><td><span class="bd ba">68,99%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Hora × Hora</div>
+      <table><thead><tr><th style="text-align:left">Hora</th><th>B2B</th><th>B2C</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td>15h00</td><td>5</td><td>242</td><td>247</td></tr>
+        <tr class="bld"><td>Total</td><td>5</td><td>242</td><td>247</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DARK STORE ══ -->
+<div id="pg-cdk" class="pg">
+  <div class="ptitle"><h1>Carteira de Pedidos – Dark Store</h1><span>02/06 – 03/06/2026</span></div>
+  <div class="krow" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kc t"><div class="v" id="dk1">116</div><div class="l">Integrados</div></div>
+    <div class="kc g"><div class="v" id="dk2">0</div><div class="l">Expedidos</div></div>
+    <div class="kc a"><div class="v" id="dk3">0</div><div class="l">Não Integrados</div></div>
+    <div class="kc a"><div class="v" id="dk4">0</div><div class="l">Cancelados</div></div>
+    <div class="kc r"><div class="v" id="dk5">0</div><div class="l">Backlogs</div></div>
+  </div>
+  <div class="g3">
+    <div class="tc"><div class="th2">Por Transportadora</div>
+      <table><thead><tr><th style="text-align:left">Data · Transp.</th><th>Total</th><th>Exp.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>02/06 · Diálogo</td><td>185</td><td>185</td><td>0</td><td><span class="bd bg">100%</span></td></tr>
+        <tr><td>03/06 · Diálogo</td><td>116</td><td>0</td><td>116</td><td><span class="bd br">0,00%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>301</td><td>185</td><td>116</td><td><span class="bd ba">61,46%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Por Canal</div>
+      <table><thead><tr><th style="text-align:left">Canal</th><th>Total</th><th>Exp.</th><th>Pend.</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td>B2C</td><td>301</td><td>185</td><td>116</td><td><span class="bd ba">61,46%</span></td></tr>
+        <tr class="bld"><td>Total</td><td>301</td><td>185</td><td>116</td><td><span class="bd ba">61,46%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="tc"><div class="th2">Hora × Hora</div>
+      <table><thead><tr><th style="text-align:left">Hora</th><th>B2C</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td>15h00</td><td>185</td><td>185</td></tr>
+        <tr class="bld"><td>Total</td><td>185</td><td>185</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ KPI BACKLOG ══ -->
+<div id="pg-bkpi" class="pg">
+  <div class="ptitle"><h1>KPI – Backlog</h1><span>Batch → Expedição · Target ≤ 0,80%</span></div>
+  <div class="tr-row">
+    <div class="tb"><div class="tl">Target</div><div class="tv gd">0,80%</div></div>
+    <div class="tb"><div class="tl">Realizado YTD</div><div class="tv ok" id="blr">0,62%</div></div>
+    <div class="tb"><div class="tl">Status</div><div class="tv ok" id="bls">✓ OK</div></div>
+  </div>
+  <div class="g2">
+    <div class="cb"><h3>Backlog – SP (%)</h3><div class="cw"><canvas id="cBSP"></canvas></div></div>
+    <div class="cb"><h3>Backlog – RJ (%)</h3><div class="cw"><canvas id="cBRJ"></canvas></div></div>
+    <div class="cb"><h3>Backlog – PE (%)</h3><div class="cw"><canvas id="cBPE"></canvas></div></div>
+    <div class="cb"><h3>Backlog – Dark Store (%)</h3><div class="cw"><canvas id="cBDK"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ══ OTIF ══ -->
+<div id="pg-otif" class="pg">
+  <div class="ptitle"><h1>BTQ OTIF</h1><span>On Time In Full · Target ≥ 97%</span></div>
+  <div class="tr-row">
+    <div class="tb"><div class="tl">Target</div><div class="tv gd">97%</div></div>
+    <div class="tb"><div class="tl">Realizado YTD</div><div class="tv ng" id="otr">96,59%</div></div>
+    <div class="tb"><div class="tl">Status</div><div class="tv ng" id="ots">⚠ Abaixo</div></div>
+  </div>
+  <div class="g2">
+    <div class="cb"><h3>OTIF – SP (%)</h3><div class="cw"><canvas id="cOSP"></canvas></div></div>
+    <div class="cb"><h3>OTIF – RJ (%)</h3><div class="cw"><canvas id="cORJ"></canvas></div></div>
+  </div>
+  <div class="cb" style="margin-top:12px"><h3>OTIF – PE (%)</h3><div class="cw"><canvas id="cOPE"></canvas></div></div>
+</div>
+
+<!-- ══ COMPLAINTS ══ -->
+<div id="pg-comp" class="pg">
+  <div class="ptitle"><h1>Complaints Logística</h1><span>403=Inversão · 404=Falta · Target ≤ 0,14%</span></div>
+  <div class="tr-row">
+    <div class="tb"><div class="tl">Target</div><div class="tv gd">0,14%</div></div>
+    <div class="tb"><div class="tl">Realizado YTD</div><div class="tv ok" id="cpr">0,109%</div></div>
+    <div class="tb"><div class="tl">Status</div><div class="tv ok" id="cps">✓ OK</div></div>
+  </div>
+  <div class="g2">
+    <div class="cb"><h3>Complaints – SP (%)</h3><div class="cw"><canvas id="cCSP"></canvas></div></div>
+    <div class="cb"><h3>Complaints – RJ (%)</h3><div class="cw"><canvas id="cCRJ"></canvas></div></div>
+    <div class="cb"><h3>Complaints – PE (%)</h3><div class="cw"><canvas id="cCPE"></canvas></div></div>
+    <div class="cb"><h3>Complaints – Dark Store (%)</h3><div class="cw"><canvas id="cCDK"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ══ ESTOQUE ══ -->
+<div id="pg-est" class="pg">
+  <div class="ptitle"><h1>Valor Total por Estoque</h1><span id="etot">Total R$ 9.195.316,62</span></div>
+  <div class="cb" style="margin-bottom:14px"><h3>Valor por Tipo de Estoque (R$)</h3><div class="cw"><canvas id="cEST"></canvas></div></div>
+  <div style="display:flex;align-items:center;gap:10px;margin:16px 0 10px">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold)">Indicadores por Tipo de Produto</div>
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+  </div>
+  <div class="sg">
+    <div class="si"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold)"></span>Machines</div><div style="font-size:15px;font-family:Georgia,serif;font-weight:700;color:var(--goldlt)">R$ 4.695.064,89</div><div style="font-size:10px;color:var(--muted);margin-top:3px;display:flex;justify-content:space-between"><span>360 itens</span><span>Share: 51,1%</span></div><div style="margin-top:5px;height:3px;background:var(--border);border-radius:2px"><div style="width:51.1%;height:100%;background:var(--gold);border-radius:2px"></div></div></div>
+    <div class="si"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--golddk)"></span>Capsules</div><div style="font-size:15px;font-family:Georgia,serif;font-weight:700;color:var(--goldlt)">R$ 3.616.813,70</div><div style="font-size:10px;color:var(--muted);margin-top:3px;display:flex;justify-content:space-between"><span>1.013 itens</span><span>Share: 39,3%</span></div><div style="margin-top:5px;height:3px;background:var(--border);border-radius:2px"><div style="width:39.3%;height:100%;background:var(--golddk);border-radius:2px"></div></div></div>
+    <div class="si"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--green)"></span>Les Collections</div><div style="font-size:15px;font-family:Georgia,serif;font-weight:700;color:var(--goldlt)">R$ 735.413,07</div><div style="font-size:10px;color:var(--muted);margin-top:3px;display:flex;justify-content:space-between"><span>460 itens</span><span>Share: 8,0%</span></div><div style="margin-top:5px;height:3px;background:var(--border);border-radius:2px"><div style="width:8%;height:100%;background:var(--green);border-radius:2px"></div></div></div>
+    <div class="si"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--teal)"></span>Milk Devices</div><div style="font-size:15px;font-family:Georgia,serif;font-weight:700;color:var(--goldlt)">R$ 102.424,68</div><div style="font-size:10px;color:var(--muted);margin-top:3px"><span>19 itens · Share: 1,1%</span></div></div>
+    <div class="si"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:#666"></span>Spare Parts</div><div style="font-size:15px;font-family:Georgia,serif;font-weight:700;color:var(--goldlt)">R$ 41.160,78</div><div style="font-size:10px;color:var(--muted);margin-top:3px"><span>91 itens · Share: 0,4%</span></div></div>
+    <div class="si"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:#888"></span>Foods & Bites</div><div style="font-size:15px;font-family:Georgia,serif;font-weight:700;color:var(--goldlt)">R$ 4.398,24</div><div style="font-size:10px;color:var(--muted);margin-top:3px"><span>3 itens</span></div></div>
+  </div>
+</div>
+
+<script>
+// ── API KEY ──────────────────────────────────────
+let API_KEY = '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'; // ◄◄◄ COLE SUA CHAVE ANTHROPIC AQUI (sk-ant-api03-...)
+
+function saveKey(){
+  const v = document.getElementById('api-key-input').value.trim();
+  if(!v.startsWith('sk-ant-')){ alert('Chave inválida. Deve começar com sk-ant-'); return; }
+  API_KEY = v;
+  localStorage.setItem('nesp_api_key', v);
+  
+}
+
+function changeKey(){
+  localStorage.removeItem('nesp_api_key');
+  API_KEY = '';
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-screen').style.display = 'flex';
+}
+
+// Hide API screen - key is hardcoded
+  document.getElementById('api-screen').style.display = 'none';
+  // Auto-load saved key
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('nesp_api_key');
+  if(saved){ API_KEY = saved;  }
+  // Also allow Enter key on input
+  document.getElementById('api-key-input').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
+});
+
+// ── CHARTS ───────────────────────────────────────
+const MOS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const G='#b89a4e',GK='#7a6330',CR='#d4b96a',TG='#e08c1a';
+const CI={};
+
+function go(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(!CI['_done_'+id]){buildC(id);CI['_done_'+id]=true;}
+}
+
+const bopts=(mx)=>({responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#888070',font:{size:10},boxWidth:10}}},
+  scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#222'}},
+    y:{ticks:{color:'#555',font:{size:9},callback:v=>v+'%'},grid:{color:'#222'},suggestedMax:mx}}});
+
+function mkC(id,d24,d25,d26,tgt,mx){
+  if(CI[id]){CI[id].destroy();}
+  const ctx=document.getElementById(id);if(!ctx)return;
+  const ds=[];
+  if(d24)ds.push({label:'2024',data:d24,backgroundColor:CR,type:'bar',order:1});
+  if(d25)ds.push({label:'2025',data:d25,backgroundColor:GK,type:'bar',order:1});
+  if(d26)ds.push({label:'2026',data:d26,backgroundColor:G,type:'bar',order:1});
+  ds.push({label:'Target',type:'line',data:Array(12).fill(tgt),borderColor:TG,borderWidth:1.5,borderDash:[4,4],pointRadius:0,fill:false,order:0});
+  CI[id]=new Chart(ctx,{type:'bar',data:{labels:MOS,datasets:ds},options:bopts(mx)});
+}
+
+const D={
+  bsp:{y24:[.04,.78,3.4,.04,6.6,5.29,5.9,1.87,.17,.13,1.33,10.66],y25:[17.9,22.9,16.1,6.3,1.8,1.8,1.8,3.3,1.7,1.5,1,.63],y26:[.12,.37,.13,.56,null,null,null,null,null,null,null,null]},
+  brj:{y24:[1.3,0,0,0,0,6.2,0,.2,1.1,.3,0,0],y25:[74.6,61.7,12,1.8,10.9,0,0,0,0,0,0,0],y26:[0,0,0,0,null,null,null,null,null,null,null,null]},
+  bpe:{y24:[3.69,0,0,.89,.02,0,0,0,0,0,.1,0],y25:[0,0,0,0,0,0,0,0,0,0,0,0],y26:[0,0,0,0,null,null,null,null,null,null,null,null]},
+  bdk:{y25:[.27,.27,.46,.08,0,0,0,0,0,2.64,31.3,0],y26:[0,0,0,4.9,null,null,null,null,null,null,null,null]},
+  osp:{y24:[99,99,98,98,97,98,98,96,98,98,93,95],y25:[11.75,60.67,75.39,59.95,78.29,79.7,89.67,91.38,90.62,90.49,91.99,89.73],y26:[89,91.56,92.46,96,null,null,null,null,null,null,null,null]},
+  orj:{y24:[100,100,100,100,99,100,100,100,100,100,100,100],y25:[100,100,100,100,100,99,100,100,98,100,100,100],y26:[100,100,100,100,null,null,null,null,null,null,null,null]},
+  ope:{y24:[96,97,100,99,97,99,97,95,100,99,94,96],y25:[96,100,100,100,97,100,100,100,100,97,98,100],y26:[95.9,94,98.57,98.68,null,null,null,null,null,null,null,null]},
+  csp:{y24:[.13,.13,.17,.16,.24,.25,.19,.12,.14,.12,.12,.13],y25:[1.16,1.48,.69,1.17,.92,.33,.28,.48,.3,.3,.39,.3],y26:[.23,.138,.139,.12,null,null,null,null,null,null,null,null]},
+  crj:{y24:[.04,.05,.09,.04,.04,.07,.11,.13,.05,0,.02,.05],y25:[.04,.13,.04,.02,.05,.04,.01,.01,.02,.05,.02,.02],y26:[.11,.18,.1,.05,null,null,null,null,null,null,null,null]},
+  cpe:{y24:[0,0,0,0,.05,.06,.02,.07,.02,.03,.1,.18],y25:[.08,0,0,0,0,0,0,0,.2,.19,.1,.12],y26:[.1,0,.03,0,null,null,null,null,null,null,null,null]},
+  cdk:{y25:[.48,.47,.39,.19,.28,.46,.4,.45,.46,.38,.55,.92],y26:[.87,.54,.5,.13,null,null,null,null,null,null,null,null]}
+};
+
+function buildC(id){
+  if(id==='bkpi'){
+    mkC('cBSP',D.bsp.y24,D.bsp.y25,D.bsp.y26,.8,25);
+    mkC('cBRJ',D.brj.y24,D.brj.y25,D.brj.y26,.8,80);
+    mkC('cBPE',D.bpe.y24,D.bpe.y25,D.bpe.y26,.8,5);
+    mkC('cBDK',null,D.bdk.y25,D.bdk.y26,.8,35);
+  }
+  if(id==='otif'){
+    mkC('cOSP',D.osp.y24,D.osp.y25,D.osp.y26,97,105);
+    mkC('cORJ',D.orj.y24,D.orj.y25,D.orj.y26,97,105);
+    mkC('cOPE',D.ope.y24,D.ope.y25,D.ope.y26,97,105);
+  }
+  if(id==='comp'){
+    mkC('cCSP',D.csp.y24,D.csp.y25,D.csp.y26,.14,1.8);
+    mkC('cCRJ',D.crj.y24,D.crj.y25,D.crj.y26,.14,.25);
+    mkC('cCPE',D.cpe.y24,D.cpe.y25,D.cpe.y26,.14,.25);
+    mkC('cCDK',null,D.cdk.y25,D.cdk.y26,.14,1);
+  }
+  if(id==='est'){
+    if(CI['cEST'])CI['cEST'].destroy();
+    const ctx=document.getElementById('cEST');if(!ctx)return;
+    CI['cEST']=new Chart(ctx,{type:'bar',
+      data:{labels:['2A','30A','3SA','3TA','3XA','3AV','2AC'],
+        datasets:[{label:'R$',data:[3403705,1904699,1423011,1216093,558900,272390,36511],
+          backgroundColor:['#b89a4e','#a88a3e','#987a2e','#886a1e','#785a0e','#684a00','#583a00'],borderRadius:2}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'R$ '+Math.round(c.parsed.y).toLocaleString('pt-BR')}}},
+        scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#222'}},
+          y:{ticks:{color:'#555',font:{size:9},callback:v=>'R$'+Math.round(v/1000)+'k'},grid:{color:'#222'}}}}});
+  }
+}
+
+// ── UPLOAD ───────────────────────────────────────
+document.getElementById('fi').onchange = e => { const f=e.target.files[0]; if(f) processFile(f); e.target.value=''; };
+document.body.ondragover = e => e.preventDefault();
+document.body.ondrop = e => { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f&&f.type==='application/pdf') processFile(f); };
+
+function pr(on,msg){
+  document.getElementById('proc').classList.toggle('on',on);
+  if(msg) document.getElementById('pmsg').textContent=msg;
+}
+function sv(id,v){ const el=document.getElementById(id); if(el&&v!=null) el.textContent=v; }
+
+async function processFile(file){
+  if(!API_KEY){ alert('Configure a API Key primeiro.'); changeKey(); return; }
+  pr(true,'Lendo PDF…');
+  try{
+    const b64 = await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=()=>res(r.result.split(',')[1]);
+      r.onerror=rej; r.readAsDataURL(file);
+    });
+
+    pr(true,'Enviando para Claude AI…');
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version':'2023-06-01'
+      },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6', max_tokens:2000,
+        messages:[{role:'user', content:[
+          {type:'document', source:{type:'base64', media_type:'application/pdf', data:b64}},
+          {type:'text', text:`Analise este PDF de relatório logístico Nespresso/Luft.
+Retorne SOMENTE JSON válido sem markdown, sem texto extra:
+{
+  "periodo": "string com período do relatório",
+  "backlog_sp": {"integracao_total":0,"backlog_total":0,"integracao_00h":0,"expedicao_00h":0,"backlog_realizado_ytd_pct":0},
+  "carteira_sp": {"aging":0,"total_pedidos":0,"pct_finalizado":0,"pendentes":0},
+  "carteira_rj": {"pedidos_carteira":0,"expedidos":0,"nao_integrados":0,"cancelados":0,"backlogs":0},
+  "carteira_pe": {"pedidos_integrados":0,"expedidos":0,"nao_integrados":0,"cancelados":0,"backlogs":0},
+  "carteira_dark": {"pedidos_integrados":0,"expedidos":0,"nao_integrados":0,"cancelados":0,"backlogs":0},
+  "otif_realizado_ytd_pct": 0,
+  "complaints_realizado_ytd_pct": 0,
+  "estoque_total": 0,
+  "series_2026": {
+    "backlog_sp":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "backlog_rj":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "backlog_pe":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "backlog_dark":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "otif_sp":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "otif_rj":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "otif_pe":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "comp_sp":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "comp_rj":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "comp_pe":[null,null,null,null,null,null,null,null,null,null,null,null],
+    "comp_dark":[null,null,null,null,null,null,null,null,null,null,null,null]
+  },
+  "resumo": "2-3 frases resumo executivo em português"
+}
+Use null para campos ou meses não encontrados no PDF.`}
+        ]}]
+      })
+    });
+
+    if(!resp.ok){
+      const err = await resp.json();
+      throw new Error(err.error?.message || resp.statusText);
+    }
+
+    pr(true,'Processando resposta…');
+    const res = await resp.json();
+    const txt = res.content?.map(c=>c.text||'').join('')||'';
+    const p = JSON.parse(txt.replace(/```json|```/g,'').trim());
+
+    // ── Apply KPIs ──
+    const b=p.backlog_sp||{};
+    sv('k1', b.integracao_total?.toLocaleString('pt-BR'));
+    sv('k2', b.backlog_total);
+    sv('k3', b.integracao_00h?.toLocaleString('pt-BR'));
+    sv('k4', b.expedicao_00h?.toLocaleString('pt-BR'));
+    if(b.backlog_realizado_ytd_pct!=null){
+      const v=b.backlog_realizado_ytd_pct, ok=v<=.8;
+      const el=document.getElementById('blr'); if(el){el.textContent=v.toFixed(2).replace('.',',')+' %'; el.className='tv '+(ok?'ok':'ng');}
+      const es=document.getElementById('bls'); if(es){es.textContent=ok?'✓ OK':'⚠ Acima'; es.className='tv '+(ok?'ok':'ng');}
+    }
+
+    const c=p.carteira_sp||{};
+    sv('sp-ag', c.aging);
+    sv('sp-tot', c.total_pedidos?.toLocaleString('pt-BR'));
+    sv('sp-pct', c.pct_finalizado!=null ? c.pct_finalizado.toFixed(2).replace('.',',')+' %' : null);
+    sv('sp-pen', c.pendentes?.toLocaleString('pt-BR'));
+
+    const rj=p.carteira_rj||{};
+    sv('rj1',rj.pedidos_carteira?.toLocaleString('pt-BR')); sv('rj2',rj.expedidos);
+    sv('rj3',rj.nao_integrados); sv('rj4',rj.cancelados); sv('rj5',rj.backlogs);
+
+    const pe=p.carteira_pe||{};
+    sv('pe1',pe.pedidos_integrados?.toLocaleString('pt-BR')); sv('pe2',pe.expedidos);
+    sv('pe3',pe.nao_integrados); sv('pe4',pe.cancelados); sv('pe5',pe.backlogs);
+
+    const dk=p.carteira_dark||{};
+    sv('dk1',dk.pedidos_integrados?.toLocaleString('pt-BR')); sv('dk2',dk.expedidos);
+    sv('dk3',dk.nao_integrados); sv('dk4',dk.cancelados); sv('dk5',dk.backlogs);
+
+    if(p.otif_realizado_ytd_pct!=null){
+      const v=p.otif_realizado_ytd_pct, ok=v>=97;
+      const el=document.getElementById('otr'); if(el){el.textContent=v.toFixed(2).replace('.',',')+' %'; el.className='tv '+(ok?'ok':'ng');}
+      const es=document.getElementById('ots'); if(es){es.textContent=ok?'✓ OK':'⚠ Abaixo'; es.className='tv '+(ok?'ok':'ng');}
+    }
+    if(p.complaints_realizado_ytd_pct!=null){
+      const v=p.complaints_realizado_ytd_pct, ok=v<=.14;
+      const el=document.getElementById('cpr'); if(el){el.textContent=v.toFixed(3).replace('.',',')+' %'; el.className='tv '+(ok?'ok':'ng');}
+      const es=document.getElementById('cps'); if(es){es.textContent=ok?'✓ OK':'⚠ Acima'; es.className='tv '+(ok?'ok':'ng');}
+    }
+
+    if(p.periodo) sv('periodo', p.periodo);
+    if(p.estoque_total) sv('etot','Total R$ '+p.estoque_total.toLocaleString('pt-BR',{minimumFractionDigits:2}));
+
+    // ── Update chart series ──
+    if(p.series_2026){
+      const s=p.series_2026;
+      const map={backlog_sp:'bsp',backlog_rj:'brj',backlog_pe:'bpe',backlog_dark:'bdk',
+        otif_sp:'osp',otif_rj:'orj',otif_pe:'ope',
+        comp_sp:'csp',comp_rj:'crj',comp_pe:'cpe',comp_dark:'cdk'};
+      Object.keys(map).forEach(k=>{ if(s[k]) D[map[k]].y26=s[k]; });
+      ['bkpi','otif','comp','est'].forEach(pg=>{ delete CI['_done_'+pg]; });
+      const cur=document.querySelector('.pg.on')?.id?.replace('pg-','');
+      if(['bkpi','otif','comp','est'].includes(cur)){buildC(cur); CI['_done_'+cur]=true;}
+    }
+
+    // Badge + Banner
+    const fb=document.getElementById('fbadge');
+    fb.textContent='✓ '+file.name; fb.style.display='inline';
+    const bn=document.getElementById('banner');
+    document.getElementById('bmsg').textContent='📊 '+(p.resumo||'Dados extraídos com sucesso.');
+    bn.style.display='flex';
+
+  } catch(err){
+    console.error(err);
+    alert('Erro ao processar PDF:\n\n'+err.message);
+  } finally {
+    pr(false);
+  }
+}
+</script>
+</body>
+</html>
