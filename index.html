@@ -232,8 +232,6 @@ tr:nth-child(odd) td{background:rgba(255,255,255,.02)}
 .proj-table-wrap tr:hover td{background:rgba(184,154,78,.07)}
 .proj-name{font-weight:700;color:#fff}
 .proj-empty-row{padding:60px 20px;text-align:center;color:var(--muted)}
-.proj-modal .fin-modal{max-width:520px}
-.proj-btn-row{display:flex;gap:8px}
 .bc-anexo-item{display:flex;align-items:center;gap:10px;background:#141414;border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px}
 .bc-anexo-item .bc-anexo-file{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
 .bc-anexo-item input{flex:1;background:#0d0d0d;border:1px solid var(--border);border-radius:8px;color:#e8e0d0;padding:6px 9px;font-size:12px}
@@ -440,7 +438,6 @@ tr:nth-child(odd) td{background:rgba(255,255,255,.02)}
 <button class="dropdown-item" data-id="finplan" onclick="goFin('finplan',this)">Planejamento Financeiro</button>
 </div>
 </div>
-<button class="tab" onclick="go('proj',this)"><svg class="icon" viewBox="0 0 24 24"><path d="M9 3h6l1 3h4v14H4V6h4z"></path><path d="M9 3v3h6V3"></path></svg> Projetos</button>
 <button class="tab" id="tv-trigger" onclick="openTvMode()"><svg class="icon" viewBox="0 0 24 24"><rect height="13" rx="2" width="18" x="3" y="4"></rect><path d="M8 21h8M12 17v4"></path></svg> Modo TV</button>
 </nav>
 <!-- ══ VISÃO GERAL — SP ══ -->
@@ -957,90 +954,6 @@ tr:nth-child(odd) td{background:rgba(255,255,255,.02)}
 <div class="subpanel-empty"><b>Movimentações — POA (Dark Store Porto Alegre)</b>Sem dados ainda. Assim que os relatórios dessa unidade chegarem, os indicadores de movimentações aparecem aqui.</div>
 </div>
 
-</div>
-<!-- ══ PROJETOS ══ -->
-<div class="pg" id="pg-proj">
-<div class="ptitle"><h1>Projetos</h1><span>Carteira de projetos · Supply Chain</span></div>
-<div class="krow" style="grid-template-columns:repeat(4,1fr)">
-<div class="kc"><div class="v" id="proj-k-total">0</div><div class="l">Total de Projetos</div></div>
-<div class="kc t"><div class="v" id="proj-k-andamento">0</div><div class="l">Em Andamento</div></div>
-<div class="kc g"><div class="v" id="proj-k-concluido">0</div><div class="l">Concluídos</div></div>
-<div class="kc a"><div class="v" id="proj-k-risco">0</div><div class="l">Em Risco / Atenção</div></div>
-</div>
-<div class="proj-toolbar">
-<div class="fin-field">
-<label for="proj-q">Buscar</label>
-<input id="proj-q" placeholder="Nome do projeto, categoria, responsável..." type="text"/>
-</div>
-<div class="fin-field">
-<label for="proj-fstatus">Status</label>
-<select id="proj-fstatus">
-<option value="">Todos</option>
-<option value="planejado">Planejado</option>
-<option value="andamento">Em Andamento</option>
-<option value="aprovacao">Aguardando Aprovação</option>
-<option value="concluido">Concluído</option>
-<option value="risco">Em Risco</option>
-<option value="cancelado">Cancelado</option>
-</select>
-</div>
-<button class="btn" id="proj-add">+ Novo Projeto</button>
-<button class="fin-io-btn" id="proj-export"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"></path></svg> Exportar</button>
-<button class="fin-io-btn" id="proj-import"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"></path></svg> Importar</button>
-<input accept="application/json" id="proj-import-file" style="display:none" type="file"/>
-<div class="fin-count"><b id="proj-rescount">0</b> projetos encontrados</div>
-</div>
-<div class="proj-table-wrap">
-<table>
-<thead>
-<tr>
-<th>Projeto</th>
-<th>Categoria</th>
-<th>Responsável</th>
-<th>Status</th>
-<th>Previsão</th>
-<th>Observações</th>
-<th></th>
-</tr>
-</thead>
-<tbody id="proj-tbody"></tbody>
-</table>
-<div class="proj-empty-row" id="proj-empty">
-<b>Nenhum projeto cadastrado ainda</b><br/>
-      Clique em "+ Novo Projeto" para começar a montar sua carteira.
-    </div>
-</div>
-</div>
-<!-- ══ PROJ EDIT MODAL ══ -->
-<div class="fin-modal-overlay" id="proj-modal-overlay">
-<div class="fin-modal">
-<h3 id="proj-modal-title">Novo Projeto</h3>
-<div class="fin-modal-sub">Preencha os dados do projeto.</div>
-<label for="proj-m-name">Nome do projeto</label>
-<input id="proj-m-name" placeholder="Ex: Business Case Combilift" type="text"/>
-<label for="proj-m-cat">Categoria</label>
-<input id="proj-m-cat" placeholder="Ex: Procurement, Logística, Tecnologia..." type="text"/>
-<label for="proj-m-owner">Responsável</label>
-<input id="proj-m-owner" placeholder="Ex: Alex Dognani" type="text"/>
-<label for="proj-m-status">Status</label>
-<select id="proj-m-status">
-<option value="planejado">Planejado</option>
-<option value="andamento">Em Andamento</option>
-<option value="aprovacao">Aguardando Aprovação</option>
-<option value="concluido">Concluído</option>
-<option value="risco">Em Risco</option>
-<option value="cancelado">Cancelado</option>
-</select>
-<label for="proj-m-date">Previsão de conclusão</label>
-<input id="proj-m-date" type="date"/>
-<label for="proj-m-notes">Observações</label>
-<textarea id="proj-m-notes" placeholder="Notas livres sobre o andamento..."></textarea>
-<div class="fin-modal-actions">
-<button class="fin-btn-remove" id="proj-m-remove">Excluir</button>
-<button class="fin-btn-cancel" id="proj-m-cancel">Cancelar</button>
-<button class="fin-btn-save" id="proj-m-save">Salvar</button>
-</div>
-</div>
 </div>
 <!-- ══ FINANCEIRO · BUSINESS CASE ══ -->
 <div class="pg" id="pg-finbc">
@@ -2809,147 +2722,6 @@ function closeTvMode(){
   if(document.fullscreenElement){ document.exitFullscreen().catch(()=>{}); }
 }
 
-// ══ PROJETOS ══════════════════════════════════════
-const PROJ_STORAGE_KEY = 'nesp_projetos_v1';
-let projData = [];
-let projState = { q:'', status:'' };
-let projEditingId = null;
-
-function projLoad(){
-  try{
-    const raw = localStorage.getItem(PROJ_STORAGE_KEY);
-    projData = raw ? JSON.parse(raw) : [];
-  }catch(e){ projData = []; }
-}
-function projSaveAll(){
-  try{ localStorage.setItem(PROJ_STORAGE_KEY, JSON.stringify(projData)); }catch(e){}
-}
-function projEscape(s){
-  if(s===undefined||s===null) return '';
-  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-const PROJ_STATUS_LABEL = {
-  planejado:'Planejado', andamento:'Em Andamento', aprovacao:'Aguardando Aprovação',
-  concluido:'Concluído', risco:'Em Risco', cancelado:'Cancelado'
-};
-
-function projInit(){
-  projLoad();
-  document.getElementById('proj-q').addEventListener('input', e=>{ projState.q = e.target.value; projRender(); });
-  document.getElementById('proj-fstatus').addEventListener('change', e=>{ projState.status = e.target.value; projRender(); });
-  document.getElementById('proj-add').addEventListener('click', ()=>projOpenEdit(null));
-  document.getElementById('proj-m-cancel').addEventListener('click', projCloseEdit);
-  document.getElementById('proj-m-save').addEventListener('click', projSaveEdit);
-  document.getElementById('proj-m-remove').addEventListener('click', projRemove);
-  document.getElementById('proj-modal-overlay').addEventListener('click', e=>{ if(e.target.id==='proj-modal-overlay') projCloseEdit(); });
-  document.getElementById('proj-export').addEventListener('click', ()=>{
-    const blob = new Blob([JSON.stringify(projData, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'projetos_' + new Date().toISOString().slice(0,10) + '.json';
-    a.click(); URL.revokeObjectURL(url);
-  });
-  document.getElementById('proj-import').addEventListener('click', ()=>document.getElementById('proj-import-file').click());
-  document.getElementById('proj-import-file').addEventListener('change', e=>{
-    const file = e.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try{
-        const imported = JSON.parse(reader.result);
-        if(Array.isArray(imported)){
-          imported.forEach(p=>{ if(!projData.find(x=>x.id===p.id)) projData.push(p); });
-          projSaveAll(); projRender();
-          alert('Projetos importados com sucesso.');
-        }
-      }catch(err){ alert('Arquivo inválido.'); }
-    };
-    reader.readAsText(file); e.target.value = '';
-  });
-  projRender();
-}
-
-function projOpenEdit(id){
-  projEditingId = id;
-  const p = id ? projData.find(x=>x.id===id) : null;
-  document.getElementById('proj-modal-title').textContent = p ? 'Editar Projeto' : 'Novo Projeto';
-  document.getElementById('proj-m-name').value = p ? p.name : '';
-  document.getElementById('proj-m-cat').value = p ? p.cat : '';
-  document.getElementById('proj-m-owner').value = p ? p.owner : '';
-  document.getElementById('proj-m-status').value = p ? p.status : 'planejado';
-  document.getElementById('proj-m-date').value = p ? p.date : '';
-  document.getElementById('proj-m-notes').value = p ? p.notes : '';
-  document.getElementById('proj-m-remove').style.display = p ? 'inline-block' : 'none';
-  document.getElementById('proj-modal-overlay').classList.add('on');
-}
-function projCloseEdit(){
-  document.getElementById('proj-modal-overlay').classList.remove('on');
-  projEditingId = null;
-}
-function projSaveEdit(){
-  const name = document.getElementById('proj-m-name').value.trim();
-  if(!name){ alert('Dê um nome ao projeto.'); return; }
-  const rec = {
-    id: projEditingId || ('p'+Date.now()),
-    name,
-    cat: document.getElementById('proj-m-cat').value.trim(),
-    owner: document.getElementById('proj-m-owner').value.trim(),
-    status: document.getElementById('proj-m-status').value,
-    date: document.getElementById('proj-m-date').value,
-    notes: document.getElementById('proj-m-notes').value.trim()
-  };
-  if(projEditingId){
-    const idx = projData.findIndex(x=>x.id===projEditingId);
-    if(idx>-1) projData[idx] = rec;
-  } else {
-    projData.push(rec);
-  }
-  projSaveAll();
-  projCloseEdit();
-  projRender();
-}
-function projRemove(){
-  if(!projEditingId) return;
-  if(!confirm('Excluir este projeto?')) return;
-  projData = projData.filter(x=>x.id!==projEditingId);
-  projSaveAll();
-  projCloseEdit();
-  projRender();
-}
-
-function projFiltered(){
-  const q = projState.q.trim().toLowerCase();
-  return projData.filter(p=>{
-    if(projState.status && p.status !== projState.status) return false;
-    if(q){
-      const hay = (p.name+' '+p.cat+' '+p.owner).toLowerCase();
-      if(!hay.includes(q)) return false;
-    }
-    return true;
-  });
-}
-
-function projRender(){
-  const rows = projFiltered();
-  document.getElementById('proj-k-total').textContent = projData.length;
-  document.getElementById('proj-k-andamento').textContent = projData.filter(p=>p.status==='andamento').length;
-  document.getElementById('proj-k-concluido').textContent = projData.filter(p=>p.status==='concluido').length;
-  document.getElementById('proj-k-risco').textContent = projData.filter(p=>p.status==='risco').length;
-  document.getElementById('proj-rescount').textContent = rows.length;
-
-  document.getElementById('proj-empty').style.display = projData.length ? 'none' : 'block';
-  document.querySelector('.proj-table-wrap table').style.display = projData.length ? '' : 'none';
-
-  document.getElementById('proj-tbody').innerHTML = rows.map(p=>`
-    <tr onclick="projOpenEdit('${p.id}')" style="cursor:pointer">
-      <td class="proj-name">${projEscape(p.name)}</td>
-      <td>${projEscape(p.cat)||'—'}</td>
-      <td>${projEscape(p.owner)||'—'}</td>
-      <td><span class="proj-status-pill ${p.status}">${PROJ_STATUS_LABEL[p.status]||p.status}</span></td>
-      <td>${p.date||'—'}</td>
-      <td style="max-width:260px;white-space:normal;color:var(--muted)">${projEscape(p.notes)||'—'}</td>
-      <td style="color:var(--gold);font-size:11px;white-space:nowrap">editar →</td>
-    </tr>`).join('');
-}
 
 // ══ BUSINESS CASE ══════════════════════════════════
 const BC_STORAGE_KEY = 'nesp_business_cases_v1';
@@ -4204,13 +3976,11 @@ async function bcGenerateDocx(b){
 
 
 // hook into existing go() without editing it: wrap on first click of Financeiro tab
-let projInited = false;
 let bcInited = false;
 const _finOrigGo = go;
 go = function(id, btn){
   _finOrigGo(id, btn);
   if(id === 'fin') finInit();
-  if(id === 'proj' && !projInited){ projInited = true; projInit(); }
   if(id === 'finbc' && !bcInited){ bcInited = true; bcInit(); }
   if(id === 'fincon' && !conInited){ conInited = true; conInit(); }
   if(id === 'finrfp' && !rfpInited){ rfpInited = true; rfpInit(); }
